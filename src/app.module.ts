@@ -22,15 +22,6 @@ import { CandidatModule } from './candidat/candidat.module';
       entities: ["dist/**/*.entity{.ts,.js}"],
       synchronize: true,
     }),
-    /*GraphQLModule.forRoot({
-      autoSchemaFile: 'schema.gql',
-      playground: true,
-    }),
-    GraphQLModule.forRoot({
-      autoSchemaFile: 'src/notification/schemaNotif.gql',
-      include: [NotificationModule],
-      playground: true,
-    }),*/
     GraphQLModule.forRoot({
       autoSchemaFile: join(process.cwd(),'schema.gql'),
     }),

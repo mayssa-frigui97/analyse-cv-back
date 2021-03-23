@@ -14,7 +14,7 @@ export class Equipe {
     @Field()
     nom:string;
 
-    @OneToMany(type=>Collaborateur, collaborateur=>collaborateur.equipe,{ cascade: ["insert"] })
+    @OneToMany(()=>Collaborateur, collaborateur=>collaborateur.equipe,{ cascade: ["insert"] })
     @Field(type=>[Collaborateur])
     collaborateurs: Collaborateur[];
     // @Field(type => [Rate])

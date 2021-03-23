@@ -17,7 +17,7 @@ export class CollaborateurResolver{
         return this.collaborateurService.findAllCol(pole);
     }
 
-    @Query(returns => Collaborateur)
+    @Query(returns => Collaborateur, { nullable: true })
     FindCol(
         @Args('idCol',{type: () => Int}) idCol: number
     ): Promise<Collaborateur>{

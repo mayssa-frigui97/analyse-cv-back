@@ -63,8 +63,8 @@ export class CreateColInput {
     evaluation?: number;
 
     @IsOptional()
-    @Field(type => ID,{nullable:true})
-    equipeId? :number;
+    @Field(type => ID)
+    equipeId :number;
 
     // @IsNotEmpty()
     // @Field(type => Cv)

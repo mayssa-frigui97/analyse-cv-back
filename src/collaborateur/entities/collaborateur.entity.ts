@@ -48,8 +48,8 @@ export class Collaborateur {
     @Field(type => Int,{nullable:true})
     evaluation?: number;
 
-    @ManyToOne(type=>Equipe, equipe=>equipe.collaborateurs)
-    @Field({nullable:true})
+    @ManyToOne(()=>Equipe, equipe=>equipe.collaborateurs)
+    @Field(type=> Equipe,{nullable:true})
     equipe? :Equipe;
     @RelationId((collaborateur:Collaborateur)=>collaborateur.equipe)
     equipeId: number;
@@ -62,10 +62,10 @@ export class Collaborateur {
     @Field(type=>[Notification],{nullable:true})
     notifications?: Notification[];
 
-    // @OneToOne(()=>Cv)
-    // @JoinColumn()
-    // @Field(type => Cv)
-    // cv :Cv;
+    @OneToOne(()=>Cv)
+    @JoinColumn()
+    @Field(type => Cv)
+    cv :Cv;
 
 
     // @BeforeInsert()

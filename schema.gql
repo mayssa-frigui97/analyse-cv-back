@@ -167,7 +167,7 @@ type Pole {
 
 type Query {
   FindCols(pole: Int): [Collaborateur!]!
-  FindCol(idCol: Int!): Collaborateur!
+  FindCol(idCol: Int!): Collaborateur
   FindPoles: [Pole!]!
   FindPole(idPole: Int!): Pole!
   FindEquipes: [Equipe!]!
@@ -219,8 +219,7 @@ input CreateColInput {
   motDePasse: String!
   roles: [UserRole!]!
   evaluation: Int
-  equipeId: Int
-  cvId: Int!
+  equipeId: ID!
 }
 
 input UpdateColInput {
