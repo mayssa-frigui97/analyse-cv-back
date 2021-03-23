@@ -1,0 +1,279 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Notification {
+  id: Int!
+  date: DateTime!
+  description: String!
+  lu: Boolean!
+  collaborateur: Collaborateur!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Entretien {
+  id: Int!
+  date: DateTime!
+  duree: String!
+  statut: StatutEntretien!
+  raisonAnnulation: String
+  candidature: Candidature!
+}
+
+enum StatutEntretien {
+  PLANIFIE
+  REPORTE
+  ANNULE
+  EFFECTUE
+}
+
+type Candidature {
+  id: Int!
+  date: DateTime!
+  cv: Cv!
+  entretiens: [Entretien!]!
+}
+
+type Candidat {
+  id: Int!
+  nom: String!
+  prenom: String!
+  cin: Float!
+  dateNaiss: DateTime!
+  adresse: String
+  tel: Float!
+  email: String!
+  avatar: String
+}
+
+type Langue {
+  id: Int!
+  nom: String!
+  niveau: String!
+  certifie: Boolean!
+  cvs: [Cv!]!
+}
+
+type Formation {
+  id: Int!
+  universite: String!
+  diplome: String!
+  dateDebut: DateTime!
+  dateFin: DateTime!
+  specialite: String!
+  niveau: String!
+  mention: String
+  cvs: [Cv!]!
+}
+
+type Experience {
+  id: Int!
+  societe: String!
+  poste: String
+  dateDebut: DateTime!
+  dateFin: DateTime!
+  description: String
+  cvs: [Cv!]!
+}
+
+type Competence {
+  id: Int!
+  nom: String!
+  version: String
+  niveau: String
+  cvs: [Cv!]!
+}
+
+type ActiviteAssociative {
+  id: Int!
+  dateDebut: DateTime!
+  dateFin: DateTime!
+  association: String!
+  poste: String
+  cvs: [Cv!]!
+}
+
+type Certificat {
+  id: Int!
+  dateObtention: DateTime!
+  dateExpiration: DateTime
+  organisation: String!
+  niveau: String
+  cvs: [Cv!]!
+}
+
+type Cv {
+  id: Int!
+  cmptLinkedin: String
+  cmptGithub: String
+  statutCV: StatutCV!
+  activiteAssociatives: [ActiviteAssociative!]
+  certificats: [Certificat!]
+  competences: [Competence!]
+  experiences: [Experience!]
+  formations: [Formation!]
+  langues: [Langue!]
+  candidatures: [Candidature!]
+  candidat: Candidat!
+}
+
+enum StatutCV {
+  RECU
+  ACCEPTE
+  REFUSE
+}
+
+type Collaborateur {
+  id: Int!
+  tel: Int!
+  poste: String!
+  salaire: Int!
+  dateEmb: DateTime
+  nomUtilisateur: String!
+  motDePasse: String!
+  roles: [UserRole!]!
+  evaluation: Int
+  equipe: Equipe
+  notifications: [Notification!]
+  cv: Cv!
+}
+
+enum UserRole {
+  ADMIN
+  RH
+  RP
+  TEAMLEADER
+  COLABORATEUR
+}
+
+type Equipe {
+  id: Int!
+  nom: String!
+  collaborateurs: [Collaborateur!]!
+  pole: Pole!
+  teamleader: Collaborateur!
+}
+
+type Pole {
+  id: Int!
+  nom: String!
+  equipes: [Equipe!]
+  rp: Collaborateur!
+}
+
+type Query {
+  FindCols(pole: Int): [Collaborateur!]!
+  FindCol(idCol: Int!): Collaborateur!
+  FindPoles: [Pole!]!
+  FindPole(idPole: Int!): Pole!
+  FindEquipes: [Equipe!]!
+  FindEquipe(idEquipe: Int!): Equipe!
+  Findnotifs: [Notification!]!
+  findnotif(idNotif: Int!): Notification!
+  findEntretiens: [Entretien!]!
+  findEntretien(idEnt: Int!): Entretien!
+  FindCVs: [Cv!]!
+  FindCV(idCV: Int!): Cv!
+  FindCertificats: [Certificat!]!
+  FindCertificat(idCertif: Int!): Certificat!
+  FindCompetences: [Competence!]!
+  FindCompetence(idComp: Int!): Competence!
+  FindExperiences: [Experience!]!
+  FindExperience(idExp: Int!): Experience!
+  FindFormations: [Formation!]!
+  FindFormation(idForm: Int!): Formation!
+  FindLangues: [Langue!]!
+  FindLangue(idLang: Int!): Langue!
+  FindActs: [ActiviteAssociative!]!
+  FindAct(idAct: Int!): ActiviteAssociative!
+  FindCandidats: [Candidat!]!
+  FindCandidat(id: Int!): Candidat!
+  FindCandidatures: [Candidature!]!
+  FindCandidature(id: Int!): Candidature!
+}
+
+type Mutation {
+  CreateCol(createColInput: CreateColInput!): Collaborateur!
+  UpdateCol(updateCollaborateurInput: UpdateColInput!, idCol: Int!): Collaborateur!
+  RemoveCol(idCol: Int!): Boolean!
+  CreatePole(createPoleInput: CreatePoleInput!): Pole!
+  CreateNotif(createNotifInput: CreateNotificationInput!): Notification!
+  CreateCv(createCvInput: CreateCvInput!): Cv!
+  UpdateCv(updateCvInput: UpdateCvInput!, idCV: Int!): Cv!
+  RemoveCv(idCV: Int!): Boolean!
+  CreateCandidat(createCandidatInput: CreateCandidatInput!): Candidat!
+  UpdateCandidat(updateCandidatInput: UpdateCandidatInput!, idCandidat: Int!): Candidat!
+  RemoveCandidat(id: Int!): Boolean!
+}
+
+input CreateColInput {
+  tel: Int
+  poste: String!
+  salaire: Int!
+  dateEmb: DateTime!
+  nomUtilisateur: String!
+  motDePasse: String!
+  roles: [UserRole!]!
+  evaluation: Int
+  equipeId: Int
+  cvId: Int!
+}
+
+input UpdateColInput {
+  tel: Int
+  poste: String
+  salaire: Int
+  dateEmb: DateTime
+  nomUtilisateur: String
+  motDePasse: String
+  roles: [UserRole!]!
+  evaluation: Int!
+}
+
+input CreatePoleInput {
+  nom: String!
+}
+
+input CreateNotificationInput {
+  date: DateTime!
+  description: String!
+  lu: Boolean = false
+}
+
+input CreateCvInput {
+  cmptLinkedin: String
+  cmptGithub: String
+  statutCV: String!
+}
+
+input UpdateCvInput {
+  cmptLinkedin: String
+  cmptGithub: String
+  statutCV: String
+}
+
+input CreateCandidatInput {
+  cin: Int
+  prenom: String!
+  nom: String!
+  dateNaiss: DateTime!
+  adresse: String
+  tel: Int!
+  email: String!
+  avatar: String
+}
+
+input UpdateCandidatInput {
+  cin: Int
+  prenom: String
+  nom: String
+  dateNaiss: DateTime
+  adresse: String
+  tel: Int
+  email: String
+  avatar: String
+}
