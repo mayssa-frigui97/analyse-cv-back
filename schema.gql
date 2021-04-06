@@ -61,7 +61,6 @@ type Langue {
 type Formation {
   id: Int!
   universite: String!
-  diplome: String!
   dateDebut: DateTime!
   dateFin: DateTime!
   specialite: String!
@@ -77,6 +76,7 @@ type Experience {
   dateDebut: DateTime!
   dateFin: DateTime!
   description: String
+  motCles: String
   cvs: [Cv!]!
 }
 
@@ -94,6 +94,7 @@ type ActiviteAssociative {
   dateFin: DateTime!
   association: String!
   poste: String
+  description: String
   cvs: [Cv!]!
 }
 
@@ -110,6 +111,8 @@ type Cv {
   id: Int!
   cmptLinkedin: String
   cmptGithub: String
+  poste: String
+  description: String
   statutCV: StatutCV!
   activiteAssociatives: [ActiviteAssociative!]
   certificats: [Certificat!]
@@ -130,6 +133,7 @@ enum StatutCV {
 type Collaborateur {
   id: Int!
   tel: Int!
+  email: String!
   poste: String!
   salaire: Int!
   dateEmb: DateTime
@@ -166,52 +170,55 @@ type Pole {
 }
 
 type Query {
-  FindCols(pole: Int): [Collaborateur!]!
-  FindCol(idCol: Int!): Collaborateur
-  FindPoles: [Pole!]!
-  FindPole(idPole: Int!): Pole!
-  FindEquipes: [Equipe!]!
-  FindEquipe(idEquipe: Int!): Equipe!
-  Findnotifs: [Notification!]!
+  findCols(pole: Int): [Collaborateur!]!
+  findCol(idCol: Int!): Collaborateur
+  findPoles: [Pole!]!
+  findPole(idPole: Int!): Pole!
+  findEquipes: [Equipe!]!
+  findEquipe(idEquipe: Int!): Equipe!
+  findnotifs: [Notification!]!
   findnotif(idNotif: Int!): Notification!
   findEntretiens: [Entretien!]!
   findEntretien(idEnt: Int!): Entretien!
-  FindCVs: [Cv!]!
-  FindCV(idCV: Int!): Cv!
-  FindCertificats: [Certificat!]!
-  FindCertificat(idCertif: Int!): Certificat!
-  FindCompetences: [Competence!]!
-  FindCompetence(idComp: Int!): Competence!
-  FindExperiences: [Experience!]!
-  FindExperience(idExp: Int!): Experience!
-  FindFormations: [Formation!]!
-  FindFormation(idForm: Int!): Formation!
-  FindLangues: [Langue!]!
-  FindLangue(idLang: Int!): Langue!
-  FindActs: [ActiviteAssociative!]!
-  FindAct(idAct: Int!): ActiviteAssociative!
-  FindCandidats: [Candidat!]!
-  FindCandidat(id: Int!): Candidat!
-  FindCandidatures: [Candidature!]!
-  FindCandidature(id: Int!): Candidature!
+  findCvs: [Cv!]!
+  findCv(idCv: Int!): Cv!
+  findCvCandidat(idCand: Int!): Cv!
+  findCertificats: [Certificat!]!
+  findCertificat(idCertif: Int!): Certificat!
+  findCompetences: [Competence!]!
+  findCompetence(idComp: Int!): Competence!
+  findExperiences: [Experience!]!
+  findExperience(idExp: Int!): Experience!
+  findExperiencesCv(idCv: Int!): [Experience!]!
+  findFormations: [Formation!]!
+  findFormation(idForm: Int!): Formation!
+  findLangues: [Langue!]!
+  findLangue(idLang: Int!): Langue!
+  findActs: [ActiviteAssociative!]!
+  findAct(idAct: Int!): ActiviteAssociative!
+  findCandidats: [Candidat!]!
+  findCandidat(idCand: Int!): Candidat!
+  findCandidatures: [Candidature!]!
+  findCandidature(id: Int!): Candidature!
 }
 
 type Mutation {
-  CreateCol(createColInput: CreateColInput!): Collaborateur!
-  UpdateCol(updateCollaborateurInput: UpdateColInput!, idCol: Int!): Collaborateur!
-  RemoveCol(idCol: Int!): Boolean!
-  CreatePole(createPoleInput: CreatePoleInput!): Pole!
-  CreateNotif(createNotifInput: CreateNotificationInput!): Notification!
-  CreateCv(createCvInput: CreateCvInput!): Cv!
-  UpdateCv(updateCvInput: UpdateCvInput!, idCV: Int!): Cv!
-  RemoveCv(idCV: Int!): Boolean!
-  CreateCandidat(createCandidatInput: CreateCandidatInput!): Candidat!
-  UpdateCandidat(updateCandidatInput: UpdateCandidatInput!, idCandidat: Int!): Candidat!
-  RemoveCandidat(id: Int!): Boolean!
+  createCol(createColInput: CreateColInput!): Collaborateur!
+  updateCol(updateColInput: UpdateColInput!, idCol: Int!): Collaborateur!
+  removeCol(idCol: Int!): Boolean!
+  createPole(createPoleInput: CreatePoleInput!): Pole!
+  createNotif(createNotifInput: CreateNotificationInput!): Notification!
+  createCv(createCvInput: CreateCvInput!): Cv!
+  updateCv(updateCvInput: UpdateCvInput!, idCv: Int!): Cv!
+  removeCv(idCv: Int!): Boolean!
+  createCandidat(createCandidatInput: CreateCandidatInput!): Candidat!
+  updateCandidat(updateCandidatInput: UpdateCandidatInput!, idCandidat: Int!): Candidat!
+  removeCandidat(idCand: Int!): Boolean!
 }
 
 input CreateColInput {
   tel: Int
+  email: String!
   poste: String!
   salaire: Int!
   dateEmb: DateTime!
@@ -224,6 +231,7 @@ input CreateColInput {
 
 input UpdateColInput {
   tel: Int
+  email: String!
   poste: String
   salaire: Int
   dateEmb: DateTime
@@ -246,12 +254,16 @@ input CreateNotificationInput {
 input CreateCvInput {
   cmptLinkedin: String
   cmptGithub: String
+  poste: String
+  description: String
   statutCV: String!
 }
 
 input UpdateCvInput {
   cmptLinkedin: String
   cmptGithub: String
+  poste: String
+  description: String
   statutCV: String
 }
 

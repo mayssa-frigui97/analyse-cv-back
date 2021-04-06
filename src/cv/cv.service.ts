@@ -63,6 +63,21 @@ export class CvService {
         return query.getOne();
     }
 
+    async findCVCandidat(id: number):Promise<Cv>{
+        const query = this.cvRepository.createQueryBuilder('cv');
+        query.where('candidat.id= :id',{id})
+        .leftJoinAndSelect('cv.candidat','candidat')
+        .leftJoinAndSelect('cv.candidatures','candidatures')
+        .leftJoinAndSelect('candidatures.entretiens','entretiens')
+        .leftJoinAndSelect('cv.langues','langues')
+        .leftJoinAndSelect('cv.formations','formations')
+        .leftJoinAndSelect('cv.experiences','experiences')
+        .leftJoinAndSelect('cv.competences','competences')
+        .leftJoinAndSelect('cv.certificats','certificats')
+        .leftJoinAndSelect('cv.activiteAssociatives','activiteAssociatives');
+        return query.getOne();
+    }
+
     async createCV(createCvInput: CreateCvInput):Promise<Cv>{
         const newCV=this.cvRepository.create(createCvInput);
         return this.cvRepository.save(newCV);
@@ -116,6 +131,13 @@ export class CvService {
         return this.experienceRepository.findOneOrFail(idExp,{relations: ['cvs','cvs.candidat']});
     }
 
+    async findExperienceCv(idCv: number): Promise<Experience[]> {
+      const query = this.experienceRepository.createQueryBuilder('experience');
+        query.where('cvs.id= :idCv',{idCv})
+        .leftJoinAndSelect('experience.cvs','cvs');
+
+        return query.getMany();
+    }
       /***************Formation*********/
       async findAllFormations():Promise<Formation[]>{
         return this.formationRepository.find({relations: ['cvs','cvs.candidat']});

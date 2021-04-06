@@ -12,41 +12,41 @@ export class CandidatResolver {
 
   /**********Candidat***********/
   @Mutation(() => Candidat)
-  CreateCandidat(@Args('createCandidatInput') createCandidatInput: CreateCandidatInput) {
+  createCandidat(@Args('createCandidatInput') createCandidatInput: CreateCandidatInput) {
     return this.candidatService.createCandidat(createCandidatInput);
   }
 
-  @Query(() => [Candidat], { name: 'FindCandidats' })
-  FindAllCandidats() {
+  @Query(() => [Candidat], { name: 'findCandidats' })
+  findAllCandidats() {
     return this.candidatService.findAllCandidat();
   }
 
-  @Query(() => Candidat, { name: 'FindCandidat' })
-  FindOneCandidat(@Args('id', { type: () => Int }) id: number) {
+  @Query(() => Candidat, { name: 'findCandidat' })
+  findOneCandidat(@Args('idCand', { type: () => Int }) id: number) {
     return this.candidatService.findOneCandidat(id);
   }
 
   @Mutation(() => Candidat)
-  UpdateCandidat(
+  updateCandidat(
     @Args('idCandidat', { type: () => Int }) id: number,
     @Args('updateCandidatInput') updateCandidatInput: UpdateCandidatInput) {
     return this.candidatService.updateCandidat(id, updateCandidatInput);
   }
 
   @Mutation(() => Boolean)
-  RemoveCandidat(@Args('id', { type: () => Int }) id: number) {
+  removeCandidat(@Args('idCand', { type: () => Int }) id: number) {
     var supp=this.candidatService.removeCandidat(id);
     return supp;
   }
 
   /**********Candidature**********/
-  @Query(() => [Candidature], { name: 'FindCandidatures' })
-  FindAllCandidatures() {
+  @Query(() => [Candidature], { name: 'findCandidatures' })
+  findAllCandidatures() {
     return this.candidatService.findAllCandidatures();
   }
 
-  @Query(() => Candidature, { name: 'FindCandidature' })
-  FindOneCandidature(@Args('id', { type: () => Int }) id: number) {
+  @Query(() => Candidature, { name: 'findCandidature' })
+  findOneCandidature(@Args('id', { type: () => Int }) id: number) {
     return this.candidatService.findOneCandidature(id);
   }
 

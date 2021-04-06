@@ -4,6 +4,7 @@ import { Equipe } from './equipe.entity';
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, RelationId } from 'typeorm';
 import { Cv } from 'src/cv/entities/cv.entity';
+import { IsEmail } from 'class-validator';
 
 @Entity('collaborateur')
 @ObjectType()
@@ -15,6 +16,11 @@ export class Collaborateur {
     @Column()
     @Field(type => Int)
     tel: number;
+
+    @Column()
+    @IsEmail()
+    @Field()
+    email: string;
 
     @Column()
     @Field()

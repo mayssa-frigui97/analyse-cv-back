@@ -30,6 +30,10 @@ export class Experience {
     @Field({nullable:true})
     description?:string;
 
+    @Column()
+    @Field({nullable:true})
+    motCles?:string;
+
     @ManyToMany(()=>Cv, cv=>cv.experiences)
     @Field(type => [Cv])
     cvs :Cv[];

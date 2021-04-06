@@ -16,6 +16,16 @@ export class CreateCvInput {
     @Field({nullable:true})
     cmptGithub?:string;
 
+    @IsString()
+    @IsOptional()
+    @Field({nullable:true})
+    poste?:string;
+
+    @IsString()
+    @IsOptional()
+    @Field({nullable:true})
+    description?:string;
+
     @IsNotEmpty()
     @Field()
     statutCV: StatutCV;

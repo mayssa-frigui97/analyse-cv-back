@@ -13,10 +13,6 @@ export class Formation {
     @Column()
     @Field()
     universite:string;
-    
-    @Column()
-    @Field()
-    diplome:string;
 
     @Column()
     @Field()

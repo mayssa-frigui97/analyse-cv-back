@@ -25,6 +25,10 @@ export class ActiviteAssociative {
     @Field({nullable:true})
     poste: string;
 
+    @Column()
+    @Field({nullable:true})
+    description?:string;
+
     @ManyToMany(()=>Cv, cv=>cv.activiteAssociatives)
     @Field(type => [Cv])
     cvs :Cv[];

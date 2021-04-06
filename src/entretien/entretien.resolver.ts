@@ -9,12 +9,12 @@ export class EntretienResolver {
   /**********Entretien************/
 
   @Query(() => [Entretien], { name: 'findEntretiens' })
-  FindAllEntretiens() {
+  findAllEntretiens() {
     return this.entretienService.findAllEntretiens();
   }
 
   @Query(() => Entretien, { name: 'findEntretien' })
-  FindOneEntretien(@Args('idEnt', { type: () => Int }) id: number) {
+  findOneEntretien(@Args('idEnt', { type: () => Int }) id: number) {
     return this.entretienService.findOneEntretien(id);
   }
 

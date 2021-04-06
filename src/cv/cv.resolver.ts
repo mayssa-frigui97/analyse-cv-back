@@ -17,97 +17,121 @@ export class CvResolver {
   /***********CV**************/
 
   @Mutation(() => Cv)
-  CreateCv(@Args('createCvInput') createCvInput: CreateCvInput) {
+  createCv(@Args('createCvInput') createCvInput: CreateCvInput) {
     return this.cvService.createCV(createCvInput);
   }
 
-  @Query(() => [Cv], { name: 'FindCVs' })
-  FindAllCVs() {
+  @Query(() => [Cv], { name: 'findCvs' })
+  findAllCVs() {
     return this.cvService.findAllCVs();
   }
 
-  @Query(() => Cv, { name: 'FindCV' })
-  FindOneCV(@Args('idCV', { type: () => Int }) idCV: number) {
+  @Query(() => Cv, { name: 'findCv' })
+  findOneCV(@Args('idCv', { type: () => Int }) idCV: number) {
     return this.cvService.findOneCV(idCV);
   }
 
+  @Query(() => Cv, { name: 'findCvCandidat' })
+  findCVCandidat(@Args('idCand', { type: () => Int }) idCand: number) {
+    return this.cvService.findCVCandidat(idCand);
+  }
+
   @Mutation(() => Cv)
-  UpdateCv(
-    @Args('idCV', { type: () => Int }) idCV: number,
-    @Args('updateCvInput') updateCvInput: UpdateCvInput) {
+  updateCv(
+    @Args('idCv', { type: () => Int }) idCV: number,
+    @Args('updateCvInput') updateCvInput: UpdateCvInput,
+  ) {
     return this.cvService.updateCV(idCV, updateCvInput);
   }
 
   @Mutation(() => Boolean)
-  RemoveCv(@Args('idCV', { type: () => Int }) idCV: number) {
-    var supp=this.cvService.removeCV(idCV);
+  removeCv(@Args('idCv', { type: () => Int }) idCV: number) {
+    var supp = this.cvService.removeCV(idCV);
     return supp;
   }
 
   /***********Certificat**************/
-  @Query(returns => [Certificat])
-    FindCertificats(): Promise<Certificat[]>{
-        return this.cvService.findAllCertificats();
-    }
+  @Query((returns) => [Certificat])
+  findCertificats(): Promise<Certificat[]> {
+    return this.cvService.findAllCertificats();
+  }
 
-    @Query(returns => Certificat)
-    FindCertificat(@Args('idCertif',{type: () => Int}) idCertif: number): Promise<Certificat>{
-        return this.cvService.findOneCertificat(idCertif);
-    }
+  @Query((returns) => Certificat)
+  findCertificat(
+    @Args('idCertif', { type: () => Int }) idCertif: number,
+  ): Promise<Certificat> {
+    return this.cvService.findOneCertificat(idCertif);
+  }
 
   /***********Competence***********/
-  @Query(returns => [Competence])
-    FindCompetences(): Promise<Competence[]>{
-        return this.cvService.findAllCompetences();
-    }
+  @Query((returns) => [Competence])
+  findCompetences(): Promise<Competence[]> {
+    return this.cvService.findAllCompetences();
+  }
 
-    @Query(returns => Competence)
-    FindCompetence(@Args('idComp',{type: () => Int}) idComp: number): Promise<Competence>{
-        return this.cvService.findOneCompetence(idComp);
-    }
+  @Query((returns) => Competence)
+  findCompetence(
+    @Args('idComp', { type: () => Int }) idComp: number,
+  ): Promise<Competence> {
+    return this.cvService.findOneCompetence(idComp);
+  }
 
   /***********Experience***********/
-  @Query(returns => [Experience])
-    FindExperiences(): Promise<Experience[]>{
-        return this.cvService.findAllExperiences();
-    }
-
-    @Query(returns => Experience)
-    FindExperience(@Args('idExp',{type: () => Int}) idExp: number): Promise<Experience>{
-        return this.cvService.findOneExperience(idExp);
-    }
-
-    /***********Formation***********/
-  @Query(returns => [Formation])
-  FindFormations(): Promise<Formation[]>{
-      return this.cvService.findAllFormations();
+  @Query((returns) => [Experience])
+  findExperiences(): Promise<Experience[]> {
+    return this.cvService.findAllExperiences();
   }
 
-  @Query(returns => Formation)
-  FindFormation(@Args('idForm',{type: () => Int}) idForm: number): Promise<Formation>{
-      return this.cvService.findOneFormation(idForm);
+  @Query((returns) => Experience)
+  findExperience(
+    @Args('idExp', { type: () => Int }) idExp: number,
+  ): Promise<Experience> {
+    return this.cvService.findOneExperience(idExp);
   }
 
-/***********Langue***********/
-@Query(returns => [Langue])
-  FindLangues(): Promise<Langue[]>{
-      return this.cvService.findAllLangues();
+  @Query((returns) => [Experience])
+  findExperiencesCv(
+    @Args('idCv', { type: () => Int }) idCv: number,
+  ): Promise<Experience[]> {
+    return this.cvService.findExperienceCv(idCv);
   }
 
-  @Query(returns => Langue)
-  FindLangue(@Args('idLang',{type: () => Int}) idLang: number): Promise<Langue>{
-      return this.cvService.findOneLangue(idLang);
+  /***********Formation***********/
+  @Query((returns) => [Formation])
+  findFormations(): Promise<Formation[]> {
+    return this.cvService.findAllFormations();
+  }
+
+  @Query((returns) => Formation)
+  findFormation(
+    @Args('idForm', { type: () => Int }) idForm: number,
+  ): Promise<Formation> {
+    return this.cvService.findOneFormation(idForm);
+  }
+
+  /***********Langue***********/
+  @Query((returns) => [Langue])
+  findLangues(): Promise<Langue[]> {
+    return this.cvService.findAllLangues();
+  }
+
+  @Query((returns) => Langue)
+  findLangue(
+    @Args('idLang', { type: () => Int }) idLang: number,
+  ): Promise<Langue> {
+    return this.cvService.findOneLangue(idLang);
   }
 
   /***********Acitvite associative***********/
-@Query(returns => [ActiviteAssociative])
-FindActs(): Promise<ActiviteAssociative[]>{
+  @Query((returns) => [ActiviteAssociative])
+  findActs(): Promise<ActiviteAssociative[]> {
     return this.cvService.findAllActs();
-}
+  }
 
-@Query(returns => ActiviteAssociative)
-FindAct(@Args('idAct',{type: () => Int}) idAct: number): Promise<ActiviteAssociative>{
+  @Query((returns) => ActiviteAssociative)
+  findAct(
+    @Args('idAct', { type: () => Int }) idAct: number,
+  ): Promise<ActiviteAssociative> {
     return this.cvService.findOneAct(idAct);
-}
-  
+  }
 }

@@ -25,6 +25,14 @@ export class Cv {
     @Field({nullable:true})
     cmptGithub?:string;
 
+    @Column()
+    @Field({nullable:true})
+    poste?:string;
+
+    @Column()
+    @Field({nullable:true})
+    description?:string;
+
     @Column({
         type: "enum",
         enum: StatutCV,

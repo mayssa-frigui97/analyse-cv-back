@@ -1,7 +1,7 @@
 import { UserRole } from './../../enum/UserRole';
 import { Pole } from './../entities/pole.entity';
 import { Field, Int, InputType } from '@nestjs/graphql';
-import { IsAlpha, IsAlphanumeric, IsDate, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsAlpha, IsAlphanumeric, IsDate, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength, IsEmail } from 'class-validator';
 
 @InputType()//representation mta3 input = dto
 export class UpdateColInput {
@@ -10,6 +10,11 @@ export class UpdateColInput {
     @IsInt()
     @Field(type => Int,{nullable:true})
     tel?: number;
+
+    @IsOptional()
+    @IsEmail()
+    @Field()
+    email: string;
 
     @IsString()
     @IsOptional()

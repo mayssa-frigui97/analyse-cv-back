@@ -1,6 +1,6 @@
 import { Cv } from '../../cv/entities/cv.entity';
 import { Field, Int, InputType, ID } from '@nestjs/graphql';
-import { IsAlpha, IsAlphanumeric, IsDate, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { IsAlpha, IsAlphanumeric, IsDate, IsEmail, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
 import { UserRole } from '../../enum/UserRole';
 import { Equipe } from '../entities/equipe.entity';
 
@@ -11,6 +11,11 @@ export class CreateColInput {
     @IsInt()
     @Field(type => Int,{nullable:true})
     tel?: number;
+
+    @IsNotEmpty()
+    @IsEmail()
+    @Field()
+    email: string;
 
     @IsString()
     @IsNotEmpty()

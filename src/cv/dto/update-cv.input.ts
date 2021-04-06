@@ -16,6 +16,16 @@ export class UpdateCvInput extends PartialType(CreateCvInput) {
     @Field({nullable:true})
     cmptGithub?:string;
 
+    @IsString()
+    @IsOptional()
+    @Field({nullable:true})
+    poste?:string;
+
+    @IsString()
+    @IsOptional()
+    @Field({nullable:true})
+    description?:string;
+
     @IsOptional()
     @Field({nullable:true})
     statutCV: StatutCV;

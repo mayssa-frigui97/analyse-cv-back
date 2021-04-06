@@ -49,7 +49,6 @@ export class CollaborateurService {
         .leftJoinAndSelect('collaborateur.equipe', 'equipe')
         .leftJoinAndSelect('equipe.pole', 'pole')
         .leftJoinAndSelect('equipe.teamleader', 'teamleader')
-        .leftJoinAndSelect('collaborateur.equipe', 'equipe')
         .leftJoinAndSelect('collaborateur.notifications','notifications')
         .leftJoinAndSelect('collaborateur.cv','cv')
         .leftJoinAndSelect('cv.candidat','candidat')
