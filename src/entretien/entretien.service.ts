@@ -16,9 +16,8 @@ export class EntretienService {
         const query = this.entretienRepository.createQueryBuilder('entretien');
         query
         .leftJoinAndSelect('entretien.candidature', 'candidature')
-        .leftJoinAndSelect('candidature.cv','cv')
-        .leftJoinAndSelect('cv.candidat','candidat')
-        .leftJoinAndSelect('cv.candidatures','candidatures')
+        .leftJoinAndSelect('candidature.personne','personne')
+        .leftJoinAndSelect('personne.cv','cv')
         .leftJoinAndSelect('cv.langues','langues')
         .leftJoinAndSelect('cv.formations','formations')
         .leftJoinAndSelect('cv.experiences','experiences')
@@ -33,9 +32,8 @@ export class EntretienService {
         const query = this.entretienRepository.createQueryBuilder('entretien');
         query.where('entretien.id= :id',{id})
         .leftJoinAndSelect('entretien.candidature', 'candidature')
-        .leftJoinAndSelect('candidature.cv','cv')
-        .leftJoinAndSelect('cv.candidat','candidat')
-        .leftJoinAndSelect('cv.candidatures','candidatures')
+        .leftJoinAndSelect('candidature.personne','personne')
+        .leftJoinAndSelect('personne.cv','cv')
         .leftJoinAndSelect('cv.langues','langues')
         .leftJoinAndSelect('cv.formations','formations')
         .leftJoinAndSelect('cv.experiences','experiences')

@@ -1,46 +1,26 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { IsEmail } from 'class-validator';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { IsBoolean } from 'class-validator';
+import { ChildEntity, Column, Entity, JoinColumn, OneToMany, OneToOne} from 'typeorm';
+import { Personne } from './personne.entity';
 
 @Entity('candidat')
+// @ChildEntity('candidat')
 @ObjectType()
-export class Candidat {
-    @PrimaryGeneratedColumn()
-    @Field(type => Int)
-    id:number;
-
+export class Candidat extends Personne{
+    
     @Column()
-    @Field()
-    nom:string;
+    @IsBoolean()
+    @Field(()=>Boolean)
+    recommande: boolean;
 
-    @Column()
-    @Field()
-    prenom:string;
 
-    @Column()
-    @Field()
-    cin: number;
+    // @OneToOne(type=>Cv, cv=>cv.candidat, {cascade: true, onDelete: "CASCADE" })
+    // @JoinColumn()
+    // @Field(type => Cv)
+    // public cv :Cv;
 
-    @Column()
-    @Field()
-    dateNaiss: Date;
-
-    @Column()
-    @Field({nullable:true})
-    adresse?: string;
-
-    @Column()
-    @Field()
-    tel: number;
-
-    @Column()
-    @Field()
-    @IsEmail()
-    email: string;
-
-    @Column()
-    @Field({nullable:true})
-    avatar?: string;
-
+    // @Column()
+    // @Field(type => Int)
+    // public cvId: number;
     
 }

@@ -9,7 +9,10 @@ import { CreatePoleInput } from './Dto/create.pole.input';
 
 @Resolver((of) => Collaborateur)
 export class CollaborateurResolver {
-  constructor(private collaborateurService: CollaborateurService) {}
+  constructor(
+    private collaborateurService: CollaborateurService,
+    // private cvService: CvService
+    ) {}
 
   /***********Colaborateur***********/
   @Query((returns) => [Collaborateur])
@@ -43,13 +46,20 @@ export class CollaborateurResolver {
 
   @Mutation(() => Boolean)
   removeCol(@Args('idCol', { type: () => Int }) idCol: number) {
-    var supp = this.collaborateurService.removeCol(idCol);
+  var supp = this.collaborateurService.removeCol(idCol);
     return supp;
   }
 
-  // @ResolveField(returns=> Pole)
-  // FindPoleOfCols(@Parent() collaborateur: Collaborateur): Promise<Pole>{
-  //   return this.collaborateurService.findOnePole(collaborateur.pole.id);
+  @Query((returns) => [Collaborateur])
+  findFilterCols(
+    @Args('selectedPoles', { type: () => [Int]}) selectedPoles?: number[],
+  ): Promise<Collaborateur[]> {
+    return this.collaborateurService.getFilterPole(selectedPoles);
+  }
+
+  // @ResolveField(returns => Equipe)
+  // async findEquipeCol(@Parent() collaborateur: Collaborateur) {
+  //   return this.collaborateurService.findOneEquipe(collaborateur.equipeId);
   // }
 
   /***********Pole***********/

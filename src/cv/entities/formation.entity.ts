@@ -2,6 +2,7 @@ import { Column, ManyToOne, ManyToMany } from 'typeorm';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Cv } from './cv.entity';
+import { IsDate } from 'class-validator';
 
 @Entity('formation')
 @ObjectType()
@@ -15,10 +16,12 @@ export class Formation {
     universite:string;
 
     @Column()
+    @IsDate()
     @Field()
     dateDebut: Date;
 
     @Column()
+    @IsDate()
     @Field()
     dateFin: Date;
 

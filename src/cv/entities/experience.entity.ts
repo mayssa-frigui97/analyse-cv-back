@@ -2,6 +2,7 @@ import { Column, ManyToMany, ManyToOne } from 'typeorm';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Cv } from './cv.entity';
+import { IsDate } from 'class-validator';
 
 @Entity('experience')
 @ObjectType()
@@ -19,10 +20,12 @@ export class Experience {
     poste?:string;
 
     @Column()
+    @IsDate()
     @Field()
     dateDebut: Date;
 
     @Column()
+    @IsDate()
     @Field()
     dateFin: Date;
 

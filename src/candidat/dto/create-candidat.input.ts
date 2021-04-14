@@ -1,45 +1,12 @@
-import { InputType, Int, Field } from '@nestjs/graphql';
-import { IsAlpha, IsDate, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { InputType, Field } from '@nestjs/graphql';
+import { IsInt, IsNotEmpty, IsBoolean } from 'class-validator';
+import { CreatePersonneInput } from './create-personne.input';
 
 @InputType()
-export class CreateCandidatInput {
-    @IsOptional()
-    @IsInt()
-    @Field(type => Int,{nullable:true})
-    cin: number;
-
-    @IsString()
-    @IsNotEmpty()
-    @IsAlpha()
-    @Field()
-    prenom:string;
-
-    @IsString()
-    @IsNotEmpty()
-    @Field()
-    nom:string;
-
-    @IsDate()
-    @IsNotEmpty()
-    @Field()
-    dateNaiss: Date;
-
-    @IsString()
-    @IsOptional()
-    @Field({nullable:true})
-    adresse?: string;
-
-    @IsInt()
-    @IsNotEmpty()
-    @Field(type => Int)
-    tel: number;
+export class CreateCandidatInput extends CreatePersonneInput{
 
     @IsNotEmpty()
-    @Field()
-    @IsEmail()
-    email: string;
-
-    @IsOptional()
-    @Field({nullable:true})
-    avatar?: string;
+    @IsBoolean()
+    @Field(type => Boolean)
+    recommande: boolean;
 }

@@ -1,4 +1,3 @@
-import { Candidat } from './../../candidat/entities/candidat.entity';
 import { CreateCvInput } from './create-cv.input';
 import { InputType, Field, Int, PartialType } from '@nestjs/graphql';
 import { StatutCV } from 'src/enum/StatutCV';
@@ -19,7 +18,7 @@ export class UpdateCvInput extends PartialType(CreateCvInput) {
     @IsString()
     @IsOptional()
     @Field({nullable:true})
-    poste?:string;
+    posteAct?:string;
 
     @IsString()
     @IsOptional()
@@ -31,6 +30,6 @@ export class UpdateCvInput extends PartialType(CreateCvInput) {
     statutCV: StatutCV;
 
     // @IsOptional()
-    // @Field(type => Candidat,{nullable:true})
-    // candidat? :Candidat;
+    // @Field(type => UpdatePersonneInput,{nullable:true})
+    // personne? :UpdatePersonneInput;
 }

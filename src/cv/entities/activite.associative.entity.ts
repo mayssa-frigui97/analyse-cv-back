@@ -1,6 +1,7 @@
 import { Cv } from './cv.entity';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { IsDate } from 'class-validator';
 
 @Entity('activiteassociative')
 @ObjectType()
@@ -10,10 +11,12 @@ export class ActiviteAssociative {
     id:number;
 
     @Column()
+    @IsDate()
     @Field()
     dateDebut:Date;
     
     @Column()
+    @IsDate()
     @Field()
     dateFin:Date;
 

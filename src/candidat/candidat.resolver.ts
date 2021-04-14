@@ -5,10 +5,12 @@ import { Candidat } from './entities/candidat.entity';
 import { CreateCandidatInput } from './dto/create-candidat.input';
 import { UpdateCandidatInput } from './dto/update-candidat.input';
 import { Cv } from 'src/cv/entities/cv.entity';
+import { CvService } from './../cv/cv.service';
 
 @Resolver(() => Candidat)
 export class CandidatResolver {
-  constructor(private readonly candidatService: CandidatService) {}
+  constructor(
+    private readonly candidatService: CandidatService) {}
 
   /**********Candidat***********/
   @Mutation(() => Candidat)
@@ -39,6 +41,16 @@ export class CandidatResolver {
     return supp;
   }
 
+  @Mutation(() => Candidat)
+  restoreCandidat(@Args('idCand', { type: () => Int }) id: number) {
+    return this.candidatService.restoreCandidat(id);
+  }
+
+  // @ResolveField(returns => Cv)
+  // async findCvCandidat(@Parent() candidat: Candidat) {
+  //   return this.cvService.findOneCV(candidat.cvId);
+  // }
+
   /**********Candidature**********/
   @Query(() => [Candidature], { name: 'findCandidatures' })
   findAllCandidatures() {
@@ -46,8 +58,8 @@ export class CandidatResolver {
   }
 
   @Query(() => Candidature, { name: 'findCandidature' })
-  findOneCandidature(@Args('id', { type: () => Int }) id: number) {
-    return this.candidatService.findOneCandidature(id);
+  findOneCandidature(@Args('idCandidature', { type: () => Int }) idCandidature: number) {
+    return this.candidatService.findOneCandidature(idCandidature);
   }
 
   // @ResolveField((returns)=>Cv)

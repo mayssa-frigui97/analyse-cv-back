@@ -1,26 +1,29 @@
 import { UserRole } from './../../enum/UserRole';
 import { Notification } from './../../notification/entities/notification.entity';
 import { Equipe } from './equipe.entity';
-import { ObjectType, Field, Int } from '@nestjs/graphql';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, RelationId } from 'typeorm';
+import { ObjectType, Field, Int, HideField } from '@nestjs/graphql';
+import { ChildEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, RelationId } from 'typeorm';
+import { IsEmail, IsOptional } from 'class-validator';
+import { Personne } from '../../candidat/entities/personne.entity';
 import { Cv } from 'src/cv/entities/cv.entity';
-import { IsEmail } from 'class-validator';
 
+// @ChildEntity('collaborateur')
 @Entity('collaborateur')
 @ObjectType()
-export class Collaborateur {
-    @PrimaryGeneratedColumn()
-    @Field(type => Int)
-    id:number;
+export class Collaborateur extends Personne{
+
+    // @PrimaryGeneratedColumn()
+    // @Field(type => Int)
+    // id:number;
 
     @Column()
     @Field(type => Int)
-    tel: number;
+    telPro: number;
 
     @Column()
     @IsEmail()
     @Field()
-    email: string;
+    emailPro: string;
 
     @Column()
     @Field()
@@ -39,39 +42,43 @@ export class Collaborateur {
     nomUtilisateur: string;
 
     @Column({select: false})
-    @Field()
+    @HideField()
     motDePasse: string;
 
     @Column({
         type: "set",
         enum: UserRole,
-        default: [UserRole.COLABORATEUR]
+        default: UserRole.COLABORATEUR
     })
-    @Field(type => [UserRole])
-    roles :UserRole[];
+    @Field(type => UserRole)
+    role :UserRole;
 
     @Column()
     @Field(type => Int,{nullable:true})
     evaluation?: number;
 
-    @ManyToOne(()=>Equipe, equipe=>equipe.collaborateurs)
+    @ManyToOne(()=>Equipe, equipe=>equipe.collaborateurs, {onDelete: 'CASCADE'})
+    @IsOptional()
     @Field(type=> Equipe,{nullable:true})
     equipe? :Equipe;
-    @RelationId((collaborateur:Collaborateur)=>collaborateur.equipe)
-    equipeId: number;
-//     @ManyToOne(type => Recipe)
-//   recipe: Recipe;
-//   @RelationId((rate: Rate) => rate.recipe)
-//   recipeId: number;
+
+    // @Column()
+    // @IsOptional()
+    // @Field(type => Int,{nullable:true})
+    // public equipeId?: number;
 
     @OneToMany(()=>Notification, notification=>notification.collaborateur)
     @Field(type=>[Notification],{nullable:true})
     notifications?: Notification[];
 
-    @OneToOne(()=>Cv)
-    @JoinColumn()
-    @Field(type => Cv)
-    cv :Cv;
+    // @OneToOne(type=>Cv, cv=>cv.collaborateur, {cascade: true, onDelete: "CASCADE" })
+    // @JoinColumn()
+    // @Field(type => Cv)
+    // public cv :Cv;
+
+    // @Column()
+    // @Field(type => Int)
+    // public cvId: number;
 
 
     // @BeforeInsert()

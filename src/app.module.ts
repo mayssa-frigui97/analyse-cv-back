@@ -18,7 +18,7 @@ import { CandidatModule } from './candidat/candidat.module';
       port: 3306,
       username: 'root',
       password: '',
-      database: 'analyse cv',
+      database: 'analyse cvs',
       entities: ["dist/**/*.entity{.ts,.js}"],
       synchronize: true,
     }),

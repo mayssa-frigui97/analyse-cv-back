@@ -1,7 +1,7 @@
 import { Entretien } from './../../entretien/entities/entretien.entity';
-import { Cv } from './../../cv/entities/cv.entity';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Personne } from './personne.entity';
 
 @Entity('candidature')
 @ObjectType()
@@ -14,9 +14,9 @@ export class Candidature {
     @Field()
     date:Date;
 
-    @ManyToOne(()=>Cv, cv=>cv.candidatures)
-    @Field(type => Cv)
-    cv :Cv;
+    @ManyToOne(()=>Personne, personne=>personne.candidatures)
+    @Field(type => Personne)
+    personne :Personne;
 
     @OneToMany(()=>Entretien, entretien=>entretien.candidature)
     @Field(type=>[Entretien])

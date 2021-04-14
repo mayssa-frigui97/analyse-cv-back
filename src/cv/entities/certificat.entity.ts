@@ -1,6 +1,7 @@
 import { Cv } from './cv.entity';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { IsDate } from 'class-validator';
 
 @Entity('certificat')
 @ObjectType()
@@ -14,10 +15,12 @@ export class Certificat {
     dateObtention:Date;
     
     @Column()
+    @IsDate()
     @Field({nullable:true})
     dateExpiration?:Date;
 
     @Column()
+    @IsDate()
     @Field()
     organisation: string;
 

@@ -1,5 +1,3 @@
-import { Candidature } from './../../candidat/entities/candidature.entity';
-import { Candidat } from './../../candidat/entities/candidat.entity';
 import { Langue } from './langue.entity';
 import { Formation } from './formation.entity';
 import { Experience } from './experience.entity';
@@ -9,6 +7,7 @@ import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { StatutCV } from 'src/enum/StatutCV';
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Certificat } from './certificat.entity';
+import { Personne } from '../../candidat/entities/personne.entity';
 
 @Entity('cv')
 @ObjectType()
@@ -27,7 +26,7 @@ export class Cv {
 
     @Column()
     @Field({nullable:true})
-    poste?:string;
+    posteAct?:string;//poste actuelle si elle existe
 
     @Column()
     @Field({nullable:true})
@@ -71,12 +70,16 @@ export class Cv {
     @Field(type=>[Langue],{nullable:true})
     langues?: Langue[];
 
-    @OneToMany(()=>Candidature, candidature=>candidature.cv)
-    @Field(type=>[Candidature],{nullable:true})
-    candidatures?: Candidature[];
+    
+    @OneToOne(type=>Personne, personne => personne.cv, {onDelete: "CASCADE" , onUpdate: "CASCADE"})
+    @Field(type => Personne)
+    personne :Personne;
+    
+    // @OneToOne(type=>Candidat, candidat => candidat.cv, {onDelete: "CASCADE" })
+    // @Field(type => Candidat)
+    // candidat :Candidat;
 
-    @OneToOne(()=>Candidat)
-    @JoinColumn()
-    @Field(type => Candidat)
-    candidat :Candidat;
+    // @OneToOne(type=>Collaborateur, col => col.cv, {onDelete: "CASCADE" })
+    // @Field(type => Collaborateur)
+    // collaborateur :Collaborateur;
 }

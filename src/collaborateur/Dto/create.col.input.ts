@@ -1,21 +1,21 @@
-import { Cv } from '../../cv/entities/cv.entity';
 import { Field, Int, InputType, ID } from '@nestjs/graphql';
 import { IsAlpha, IsAlphanumeric, IsDate, IsEmail, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { CreatePersonneInput } from 'src/candidat/dto/create-personne.input';
 import { UserRole } from '../../enum/UserRole';
-import { Equipe } from '../entities/equipe.entity';
+import { Equipe } from './../entities/equipe.entity';
 
 @InputType()//representation mta3 input = dto
-export class CreateColInput {
+export class CreateColInput extends CreatePersonneInput{
 
     @IsOptional()
     @IsInt()
     @Field(type => Int,{nullable:true})
-    tel?: number;
+    telPro?: number;
 
     @IsNotEmpty()
     @IsEmail()
     @Field()
-    email: string;
+    emailPro: string;
 
     @IsString()
     @IsNotEmpty()
@@ -53,8 +53,8 @@ export class CreateColInput {
     motDePasse: string;
 
     @IsNotEmpty()
-    @Field(type => [UserRole])
-    roles: UserRole[];
+    @Field(type => UserRole)
+    role: UserRole;
 
     @Max(5, {
       message: 'Evaluation max=5',
@@ -67,18 +67,19 @@ export class CreateColInput {
     @Field(type => Int,{nullable:true})
     evaluation?: number;
 
-    @IsOptional()
-    @Field(type => ID)
-    equipeId :number;
-
-    // @IsNotEmpty()
-    // @Field(type => Cv)
-    // cv :Cv;
-
     // @IsNumber()
     // @IsOptional()
     // @Field(type => Int,{nullable:true})
     // equipeId? :number;
+    
+    @IsOptional()
+    @Field(type => ID)
+    equipeId :number;
+
+    // @IsOptional()
+    // @Field(type => Equipe, {nullable:true})
+    // equipe? :Equipe;
+
 
     // @IsNumber()
     // @IsNotEmpty()

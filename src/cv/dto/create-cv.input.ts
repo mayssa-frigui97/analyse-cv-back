@@ -1,4 +1,3 @@
-import { Candidat } from './../../candidat/entities/candidat.entity';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { InputType, Int, Field } from '@nestjs/graphql';
 import { StatutCV } from 'src/enum/StatutCV';
@@ -19,7 +18,7 @@ export class CreateCvInput {
     @IsString()
     @IsOptional()
     @Field({nullable:true})
-    poste?:string;
+    posteAct?:string;
 
     @IsString()
     @IsOptional()

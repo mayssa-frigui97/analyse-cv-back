@@ -2,13 +2,16 @@ import { ActiviteAssociative } from './entities/activite.associative.entity';
 import { Experience } from './entities/experience.entity';
 import { Competence } from './entities/competence.entity';
 import { Certificat } from './entities/certificat.entity';
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, ResolveField, Parent } from '@nestjs/graphql';
 import { CvService } from './cv.service';
 import { Cv } from './entities/cv.entity';
 import { CreateCvInput } from './dto/create-cv.input';
 import { UpdateCvInput } from './dto/update-cv.input';
 import { Formation } from './entities/formation.entity';
 import { Langue } from './entities/langue.entity';
+import { Personne } from '../candidat/entities/personne.entity';
+import { Candidat } from './../candidat/entities/candidat.entity';
+import { Collaborateur } from 'src/collaborateur/entities/collaborateur.entity';
 
 @Resolver(() => Cv)
 export class CvResolver {
@@ -32,8 +35,8 @@ export class CvResolver {
   }
 
   @Query(() => Cv, { name: 'findCvCandidat' })
-  findCVCandidat(@Args('idCand', { type: () => Int }) idCand: number) {
-    return this.cvService.findCVCandidat(idCand);
+  findCvCandidat(@Args('idCand', { type: () => Int }) idCand: number) {
+    return this.cvService.findCvCandidat(idCand);
   }
 
   @Mutation(() => Cv)
@@ -49,6 +52,20 @@ export class CvResolver {
     var supp = this.cvService.removeCV(idCV);
     return supp;
   }
+
+  @ResolveField(returns => Cv)
+  async findCvPersonne(@Parent() personne: Personne) {
+    return this.cvService.findOneCV(personne.cvId);
+  }
+  // @ResolveField(returns => Cv)
+  // async findCvCandidat(@Parent() candidat: Candidat) {
+  //   return this.cvService.findOneCV(candidat.cvId);
+  // }
+
+  // @ResolveField(returns => Cv)
+  // async findCvCol(@Parent() col: Collaborateur) {
+  //   return this.cvService.findOneCV(col.cvId);
+  // }
 
   /***********Certificat**************/
   @Query((returns) => [Certificat])

@@ -1,36 +1,37 @@
 import { UserRole } from './../../enum/UserRole';
-import { Pole } from './../entities/pole.entity';
-import { Field, Int, InputType } from '@nestjs/graphql';
-import { IsAlpha, IsAlphanumeric, IsDate, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength, IsEmail } from 'class-validator';
+import { Field, Int, InputType} from '@nestjs/graphql';
+import { IsAlpha, IsAlphanumeric, IsDate, IsInt, IsNumber, IsOptional, IsString, MaxLength, MinLength, IsEmail } from 'class-validator';
+import { UpdateEquipeInput } from './update-equipe.input';
+import { UpdatePersonneInput } from '../../candidat/dto/update-personne.input';
 
 @InputType()//representation mta3 input = dto
-export class UpdateColInput {
+export class UpdateColInput extends UpdatePersonneInput {
 
     @IsOptional()
     @IsInt()
     @Field(type => Int,{nullable:true})
-    tel?: number;
+    telPro?: number;
 
     @IsOptional()
     @IsEmail()
-    @Field()
-    email: string;
+    @Field({nullable:true})
+    emailPro?: string;
 
     @IsString()
     @IsOptional()
     @IsAlpha()
     @Field({nullable:true})
-    poste: string;
+    poste?: string;
 
     @IsNumber()
     @IsOptional()
     @Field(type => Int,{nullable:true})
-    salaire: number;
+    salaire?: number;
 
     @IsDate()
     @IsOptional()
     @Field({nullable:true})
-    dateEmb: Date;
+    dateEmb?: Date;
 
     @MaxLength(20, {
         message: 'Nom utilisateur is too long',
@@ -38,7 +39,7 @@ export class UpdateColInput {
     @IsAlphanumeric()
     @IsOptional()
     @Field({nullable:true})
-    nomUtilisateur: string;
+    nomUtilisateur?: string;
 
     @MaxLength(20, {
         message: 'Mot de passe is too long',
@@ -49,12 +50,12 @@ export class UpdateColInput {
     @IsAlphanumeric()
     @IsOptional()
     @Field({nullable:true})
-    motDePasse: string;
+    motDePasse?: string;
 
     @IsNumber()
     @IsOptional()
-    @Field(type=> [UserRole])
-    roles: UserRole[];
+    @Field(type=> UserRole,{nullable:true})
+    role?: UserRole;
 
     @MaxLength(5, {
       message: 'Evaluation max=5',
@@ -64,15 +65,14 @@ export class UpdateColInput {
     })
     @IsNumber()
     @IsOptional()
-    @Field(type => Int)
+    @Field(type => Int,{nullable:true})
     evaluation?: number;
 
+    @IsOptional()
+    @Field(type => UpdateEquipeInput,{nullable:true})
+    equipe? :UpdateEquipeInput;
+    
     // @IsOptional()
-    // @Field(type => Equipe,{nullable:true})
+    // @Field(type => Equipe, equipe => equipe.collaborateurs,{nullable:true})
     // equipe? :Equipe;
-
-    // @IsOptional()
-    // @Field(type => Cv,{nullable:true})
-    // cv? :Cv;
-
 }
