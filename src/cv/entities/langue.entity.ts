@@ -17,7 +17,11 @@ export class Langue {
     @Field()
     niveau:string;
 
-    @Column()
+    @Column({
+        name: "certifie",
+        type: "boolean",
+        default: false
+      })
     @Field()
     certifie: boolean;
 

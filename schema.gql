@@ -65,9 +65,9 @@ type ActiviteAssociative {
 
 type Certificat {
   id: Int!
-  dateObtention: DateTime!
+  dateObtention: DateTime
   dateExpiration: DateTime
-  organisation: String!
+  nom: String!
   niveau: String
   cvs: [Cv!]!
 }
@@ -163,7 +163,7 @@ enum UserRole {
   RH
   RP
   TEAMLEADER
-  COLABORATEUR
+  COLLABORATEUR
 }
 
 type Equipe {
@@ -200,11 +200,15 @@ type Candidat {
 type Query {
   findCols(pole: Int): [Collaborateur!]!
   findCol(idCol: Int!): Collaborateur
-  findFilterCols(selectedPoles: [Int!]!): [Collaborateur!]!
+  findFilterCols(selectedComp: [String!], selectedPoste: [String!], selectedUniver: [String!], selectedSpec: [String!], selectedNiv: [String!], selectedEquipes: [Int!], selectedPoles: [Int!]): [Collaborateur!]!
+  findFilteredCols(filterInput: FilterInput!): [Collaborateur!]!
+  findFilterColsRole(selectedRoles: [UserRole!]!): [Collaborateur!]!
   findPoles: [Pole!]!
   findPole(idPole: Int!): Pole!
+  findPoleRp(rpId: Int!): Pole!
   findEquipes: [Equipe!]!
   findEquipe(idEquipe: Int!): Equipe!
+  findEquipesPole(idPoles: [Int!]!): [Equipe!]!
   findnotifs: [Notification!]!
   findnotif(idNotif: Int!): Notification!
   findEntretiens: [Entretien!]!
@@ -212,14 +216,16 @@ type Query {
   findCvs: [Cv!]!
   findCv(idCv: Int!): Cv!
   findCvCandidat(idCand: Int!): Cv!
+  findPostes: [Cv!]!
   findCertificats: [Certificat!]!
   findCertificat(idCertif: Int!): Certificat!
   findCompetences: [Competence!]!
   findCompetence(idComp: Int!): Competence!
   findExperiences: [Experience!]!
   findExperience(idExp: Int!): Experience!
-  findExperiencesCv(idCv: Int!): [Experience!]!
-  findFormations: [Formation!]!
+  findUniversites: [Formation!]!
+  findSpecialites: [Formation!]!
+  findNivFormations: [Formation!]!
   findFormation(idForm: Int!): Formation!
   findLangues: [Langue!]!
   findLangue(idLang: Int!): Langue!
@@ -227,8 +233,14 @@ type Query {
   findAct(idAct: Int!): ActiviteAssociative!
   findCandidats: [Candidat!]!
   findCandidat(idCand: Int!): Candidat!
+  findFilterCands(selectedComp: [String!], selectedPoste: [String!], selectedUniver: [String!], selectedSpec: [String!], selectedNiv: [String!]): [Candidat!]!
   findCandidatures: [Candidature!]!
   findCandidature(idCandidature: Int!): Candidature!
+}
+
+input FilterInput {
+  champs: String!
+  valeurs: [Int!]!
 }
 
 type Mutation {
@@ -240,6 +252,12 @@ type Mutation {
   createCv(createCvInput: CreateCvInput!): Cv!
   updateCv(updateCvInput: UpdateCvInput!, idCv: Int!): Cv!
   removeCv(idCv: Int!): Boolean!
+  updateCertif(updateCertifInput: UpdateCertifInput!, idCertif: Int!): Certificat!
+  updateCompetence(updateCompetenceInput: UpdateCompetenceInput!, idCompetence: Int!): Competence!
+  updateExperience(updateExperienceInput: UpdateExperienceInput!, idExperience: Int!): Experience!
+  updateFormation(updateFormationInput: UpdateFormationInput!, idFormation: Int!): Formation!
+  updateLangue(updateLangueInput: UpdateLangueInput!, idLangue: Int!): Langue!
+  updateAct(updateActAssocInput: UpdateActAssocInput!, idAct: Int!): ActiviteAssociative!
   createCandidat(createCandidatInput: CreateCandidatInput!): Candidat!
   updateCandidat(updateCandidatInput: UpdateCandidatInput!, idCandidat: Int!): Candidat!
   removeCandidat(idCand: Int!): Boolean!
@@ -265,7 +283,7 @@ input CreateColInput {
   motDePasse: String!
   role: UserRole!
   evaluation: Int
-  equipeId: ID!
+  equipeId: Int
 }
 
 input UpdateColInput {
@@ -324,6 +342,51 @@ input CreateCvInput {
   posteAct: String
   description: String
   statutCV: String!
+}
+
+input UpdateCertifInput {
+  dateObtention: DateTime
+  dateExpiration: DateTime
+  nom: String
+  niveau: String
+}
+
+input UpdateCompetenceInput {
+  nom: String
+  version: String
+  niveau: String
+}
+
+input UpdateExperienceInput {
+  dateDebut: DateTime
+  dateFin: DateTime
+  societe: String
+  poste: String
+  description: String
+  motCles: String
+}
+
+input UpdateFormationInput {
+  dateDebut: DateTime
+  dateFin: DateTime
+  universite: String
+  specialite: String
+  niveau: String
+  mention: String
+}
+
+input UpdateLangueInput {
+  nom: String
+  niveau: String
+  certifie: Boolean
+}
+
+input UpdateActAssocInput {
+  dateDebut: DateTime
+  dateFin: DateTime
+  association: String
+  poste: String
+  description: String
 }
 
 input CreateCandidatInput {

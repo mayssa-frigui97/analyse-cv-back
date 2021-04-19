@@ -46,9 +46,9 @@ export class Collaborateur extends Personne{
     motDePasse: string;
 
     @Column({
-        type: "set",
+        type: "enum",
         enum: UserRole,
-        default: UserRole.COLABORATEUR
+        default: UserRole.COLLABORATEUR
     })
     @Field(type => UserRole)
     role :UserRole;

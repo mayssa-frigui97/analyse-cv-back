@@ -5,7 +5,7 @@ export enum UserRole {
     RH = 'RH',
     RP = 'RP',
     TEAMLEADER = 'TEAMLEADER',
-    COLABORATEUR ='COLABORATEUR'
+    COLLABORATEUR ='COLLABORATEUR'
   }
 
   registerEnumType(UserRole, {name:'UserRole',});

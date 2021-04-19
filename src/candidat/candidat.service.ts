@@ -85,10 +85,6 @@ export class CandidatService {
 //       return query.getOne();
 //   }
 
-//   async findCvCandidat2(candidat: Candidat): Promise<Cv> {
-//     return this.cvService.findCvCandidat(candidat.cv.id);
-// }
-
   async removeCandidat(idCand: number) {
     var supp = false;
     const candidat = await this.findOneCandidat(idCand);
@@ -103,45 +99,31 @@ export class CandidatService {
     const candidatToRemove=await this.candidatRepository.remove(candidat);
     if (candidatToRemove) supp=true;
     return await supp;
-
-    // const candidat = this.candidatRepository.createQueryBuilder('candidat');
-    // candidat
-    //   .where('candidat.id= :id', { id })
-    //   .leftJoinAndSelect('candidat.cv', 'cv')
-    //   .getOne();
-
-    // const candidat = await this.findOneCandidat(idCand);
-    // const idcv = candidat.cv.id;
-    // const cv = this.cvRepository.createQueryBuilder('cv');
-    // cv.where('cv.id= :', { idcv })
-    //   .leftJoinAndSelect('candidat.cv', 'cv')
-    //   .getOne();
-    // const cv = await this.findCvCandidat(candidat);
-
-
-
-    // const candidat = await this.candidatRepository.findOne({
-    //   where: { id: 'idCand' },
-    //   relations: ['cv'],
-    // });
-    // const candidat= await this.findOneCandidat(idCand);
-    // const cv = await this.cvRepository.findOne({
-    //   where: { id: candidat.cv.id }
-    //   });
-    
-    // candidat.cv=null;
-    
-    // console.log("candidat:",candidat);
-    // await this.cvRepository.remove(cv);
-    // await this.candidatRepository.remove(candidat);
-    // if (candidat)
-    //   supp = true;
-    // return await supp;
   }
 
   async restoreCandidat(idCand: number) {
     return this.candidatRepository.restore(idCand);
   }
+
+  async getFilterCand(selectedNiv?: string[], selectedSpec?: string[],selectedUniver?: string[],selectedPoste?: string[],selectedComp?: string[]):Promise<Candidat[]>{
+    const query = this.candidatRepository.createQueryBuilder('candidat');
+    query
+      .where('cv.posteAct in (:selectedPoste)',{selectedPoste})
+      .orWhere('formations.universite in (:selectedUniver)', { selectedUniver })
+      .orWhere('formations.niveau in (:selectedNiv)', { selectedNiv })
+      .orWhere('formations.specialite in (:selectedSpec)',{selectedSpec})
+      .orWhere('competences.nom in (:selectedComp)',{selectedComp})
+      .leftJoinAndSelect('candidat.candidatures', 'candidatures')
+      .leftJoinAndSelect('candidatures.entretiens', 'entretiens')
+      .leftJoinAndSelect('candidat.cv', 'cv')
+      .leftJoinAndSelect('cv.langues', 'langues')
+      .leftJoinAndSelect('cv.formations', 'formations')
+      .leftJoinAndSelect('cv.experiences', 'experiences')
+      .leftJoinAndSelect('cv.competences', 'competences')
+      .leftJoinAndSelect('cv.certificats', 'certificats')
+      .leftJoinAndSelect('cv.activiteAssociatives', 'activiteAssociatives');
+    return query.getMany();
+}
 
   /***************Candidature*********/
   async findAllCandidatures(): Promise<Candidature[]> {

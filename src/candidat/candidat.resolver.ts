@@ -46,10 +46,16 @@ export class CandidatResolver {
     return this.candidatService.restoreCandidat(id);
   }
 
-  // @ResolveField(returns => Cv)
-  // async findCvCandidat(@Parent() candidat: Candidat) {
-  //   return this.cvService.findOneCV(candidat.cvId);
-  // }
+  @Query((returns) => [Candidat])
+  findFilterCands(
+    @Args('selectedNiv', { type: () => [String],nullable:true}) selectedNiv?: string[],
+    @Args('selectedSpec', { type: () => [String],nullable:true}) selectedSpec?: string[],
+    @Args('selectedUniver', { type: () => [String],nullable:true}) selectedUniver?: string[],
+    @Args('selectedPoste', { type: () => [String],nullable:true}) selectedPoste?: string[],
+    @Args('selectedComp', { type: () => [String],nullable:true}) selectedComp?: string[]
+  ): Promise<Candidat[]> {
+    return this.candidatService.getFilterCand(selectedNiv,selectedSpec,selectedUniver,selectedPoste,selectedComp);
+  }
 
   /**********Candidature**********/
   @Query(() => [Candidature], { name: 'findCandidatures' })

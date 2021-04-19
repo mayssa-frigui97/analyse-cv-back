@@ -11,8 +11,8 @@ export class Certificat {
     id:number;
 
     @Column()
-    @Field()
-    dateObtention:Date;
+    @Field({nullable:true})
+    dateObtention?:Date;
     
     @Column()
     @IsDate()
@@ -22,7 +22,7 @@ export class Certificat {
     @Column()
     @IsDate()
     @Field()
-    organisation: string;
+    nom: string;
 
     @Column()
     @Field({nullable:true})

@@ -67,14 +67,14 @@ export class CreateColInput extends CreatePersonneInput{
     @Field(type => Int,{nullable:true})
     evaluation?: number;
 
-    // @IsNumber()
-    // @IsOptional()
-    // @Field(type => Int,{nullable:true})
-    // equipeId? :number;
-    
+    @IsNumber()
     @IsOptional()
-    @Field(type => ID)
-    equipeId :number;
+    @Field(type => Int,{nullable:true})
+    equipeId? :number;
+    
+    // @IsOptional()
+    // @Field(type => ID)
+    // equipeId :number;
 
     // @IsOptional()
     // @Field(type => Equipe, {nullable:true})

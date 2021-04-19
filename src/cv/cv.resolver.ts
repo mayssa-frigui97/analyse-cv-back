@@ -10,8 +10,12 @@ import { UpdateCvInput } from './dto/update-cv.input';
 import { Formation } from './entities/formation.entity';
 import { Langue } from './entities/langue.entity';
 import { Personne } from '../candidat/entities/personne.entity';
-import { Candidat } from './../candidat/entities/candidat.entity';
-import { Collaborateur } from 'src/collaborateur/entities/collaborateur.entity';
+import { UpdateCertifInput } from './dto/update-certif-input';
+import { UpdateActAssocInput } from './dto/update-act-assoc-input';
+import { UpdateLangueInput } from './dto/update-langue-input';
+import { UpdateExperienceInput } from './dto/update-experience-input';
+import { UpdateCompetenceInput } from './dto/update-competence-input';
+import { UpdateFormationInput } from './dto/update-formation-input';
 
 @Resolver(() => Cv)
 export class CvResolver {
@@ -53,10 +57,17 @@ export class CvResolver {
     return supp;
   }
 
+  @Query(() => [Cv], { name: 'findPostes' })
+  findPostes() {
+    return this.cvService.findPostes();
+  }
+
   @ResolveField(returns => Cv)
   async findCvPersonne(@Parent() personne: Personne) {
     return this.cvService.findOneCV(personne.cvId);
   }
+
+
   // @ResolveField(returns => Cv)
   // async findCvCandidat(@Parent() candidat: Candidat) {
   //   return this.cvService.findOneCV(candidat.cvId);
@@ -80,6 +91,14 @@ export class CvResolver {
     return this.cvService.findOneCertificat(idCertif);
   }
 
+  @Mutation(() => Certificat)
+  updateCertif(
+    @Args('idCertif', { type: () => Int }) idCertif: number,
+    @Args('updateCertifInput') updateCertifInput: UpdateCertifInput,
+  ) {
+    return this.cvService.updateCertif(idCertif, updateCertifInput);
+  }
+
   /***********Competence***********/
   @Query((returns) => [Competence])
   findCompetences(): Promise<Competence[]> {
@@ -91,6 +110,14 @@ export class CvResolver {
     @Args('idComp', { type: () => Int }) idComp: number,
   ): Promise<Competence> {
     return this.cvService.findOneCompetence(idComp);
+  }
+
+  @Mutation(() => Competence)
+  updateCompetence(
+    @Args('idCompetence', { type: () => Int }) idCompetence: number,
+    @Args('updateCompetenceInput') updateCompetenceInput: UpdateCompetenceInput,
+  ) {
+    return this.cvService.updateCompetence(idCompetence, updateCompetenceInput);
   }
 
   /***********Experience***********/
@@ -106,17 +133,28 @@ export class CvResolver {
     return this.cvService.findOneExperience(idExp);
   }
 
-  @Query((returns) => [Experience])
-  findExperiencesCv(
-    @Args('idCv', { type: () => Int }) idCv: number,
-  ): Promise<Experience[]> {
-    return this.cvService.findExperienceCv(idCv);
+  @Mutation(() => Experience)
+  updateExperience(
+    @Args('idExperience', { type: () => Int }) idExperience: number,
+    @Args('updateExperienceInput') updateExperienceInput: UpdateExperienceInput,
+  ) {
+    return this.cvService.updateExperience(idExperience, updateExperienceInput);
   }
 
   /***********Formation***********/
   @Query((returns) => [Formation])
-  findFormations(): Promise<Formation[]> {
-    return this.cvService.findAllFormations();
+  findUniversites(): Promise<Formation[]> {
+    return this.cvService.findUniverFormations();
+  }
+
+  @Query((returns) => [Formation])
+  findSpecialites(): Promise<Formation[]> {
+    return this.cvService.findSpecFormations();
+  }
+
+  @Query((returns) => [Formation])
+  findNivFormations(): Promise<Formation[]> {
+    return this.cvService.findNivFormations();
   }
 
   @Query((returns) => Formation)
@@ -124,6 +162,14 @@ export class CvResolver {
     @Args('idForm', { type: () => Int }) idForm: number,
   ): Promise<Formation> {
     return this.cvService.findOneFormation(idForm);
+  }
+
+  @Mutation(() => Formation)
+  updateFormation(
+    @Args('idFormation', { type: () => Int }) idFormation: number,
+    @Args('updateFormationInput') updateFormationInput: UpdateFormationInput,
+  ) {
+    return this.cvService.updateFormation(idFormation, updateFormationInput);
   }
 
   /***********Langue***********/
@@ -139,6 +185,14 @@ export class CvResolver {
     return this.cvService.findOneLangue(idLang);
   }
 
+  @Mutation(() => Langue)
+  updateLangue(
+    @Args('idLangue', { type: () => Int }) idLangue: number,
+    @Args('updateLangueInput') updateLangueInput: UpdateLangueInput,
+  ) {
+    return this.cvService.updateLangue(idLangue, updateLangueInput);
+  }
+
   /***********Acitvite associative***********/
   @Query((returns) => [ActiviteAssociative])
   findActs(): Promise<ActiviteAssociative[]> {
@@ -150,5 +204,13 @@ export class CvResolver {
     @Args('idAct', { type: () => Int }) idAct: number,
   ): Promise<ActiviteAssociative> {
     return this.cvService.findOneAct(idAct);
+  }
+
+  @Mutation(() => ActiviteAssociative)
+  updateAct(
+    @Args('idAct', { type: () => Int }) idAct: number,
+    @Args('updateActAssocInput') updateActAssocInput: UpdateActAssocInput,
+  ) {
+    return this.cvService.updateAct(idAct, updateActAssocInput);
   }
 }
