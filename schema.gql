@@ -130,7 +130,7 @@ type Personne {
   avatar: String
   cv: Cv!
   cvId: Int!
-  candidatures: [Candidature!]!
+  candidatures: [Candidature!]
 }
 
 type Collaborateur {
@@ -145,7 +145,7 @@ type Collaborateur {
   avatar: String
   cv: Cv!
   cvId: Int!
-  candidatures: [Candidature!]!
+  candidatures: [Candidature!]
   telPro: Int!
   emailPro: String!
   poste: String!
@@ -193,8 +193,13 @@ type Candidat {
   avatar: String
   cv: Cv!
   cvId: Int!
-  candidatures: [Candidature!]!
+  candidatures: [Candidature!]
   recommande: Boolean!
+}
+
+type Connexion {
+  access_token: String!
+  user: Collaborateur!
 }
 
 type Query {
@@ -236,6 +241,7 @@ type Query {
   findFilterCands(selectedComp: [String!], selectedPoste: [String!], selectedUniver: [String!], selectedSpec: [String!], selectedNiv: [String!]): [Candidat!]!
   findCandidatures: [Candidature!]!
   findCandidature(idCandidature: Int!): Candidature!
+  getUserAuth: Collaborateur!
 }
 
 input FilterInput {
@@ -262,6 +268,7 @@ type Mutation {
   updateCandidat(updateCandidatInput: UpdateCandidatInput!, idCandidat: Int!): Candidat!
   removeCandidat(idCand: Int!): Boolean!
   restoreCandidat(idCand: Int!): Candidat!
+  login(motDePasse: String!, nomUtilisateur: String!): Connexion!
 }
 
 input CreateColInput {

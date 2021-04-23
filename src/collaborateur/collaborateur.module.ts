@@ -11,6 +11,7 @@ import { Cv } from 'src/cv/entities/cv.entity';
   imports: [
     TypeOrmModule.forFeature([Collaborateur,Equipe,Pole,Personne,Cv]),//ken mch fi nafs l module tzid lmodule hna(many to one)
 ],
-  providers: [CollaborateurService, CollaborateurResolver]
+  providers: [CollaborateurService, CollaborateurResolver],
+  exports: [CollaborateurService]
 })
 export class CollaborateurModule {}

@@ -2,10 +2,10 @@ import { UserRole } from './../../enum/UserRole';
 import { Notification } from './../../notification/entities/notification.entity';
 import { Equipe } from './equipe.entity';
 import { ObjectType, Field, Int, HideField } from '@nestjs/graphql';
-import { ChildEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, RelationId } from 'typeorm';
-import { IsEmail, IsOptional } from 'class-validator';
+import { BeforeInsert, ChildEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, RelationId } from 'typeorm';
+import { IsEmail, IsOptional, MaxLength, MinLength } from 'class-validator';
 import { Personne } from '../../candidat/entities/personne.entity';
-import { Cv } from 'src/cv/entities/cv.entity';
+import * as bcrypt from 'bcrypt';
 
 // @ChildEntity('collaborateur')
 @Entity('collaborateur')
@@ -37,13 +37,36 @@ export class Collaborateur extends Personne{
     @Field({nullable: true})
     dateEmb?: Date;
 
-    @Column({ unique: true })
+    @Column({ 
+        unique: true,
+        type: 'varchar', 
+        nullable: false, })
     @Field()
+    @MaxLength(20, {
+        message: 'Le nom utilisateur doit avoir au minimum 20 caractéres !',
+      })
+    @MinLength(4, {
+        message: 'Le nom utilisateur doit avoir au minimum 4 caractéres !',
+    })
     nomUtilisateur: string;
 
-    @Column({select: false})
+    @Column({
+        select: false,
+        nullable: false
+    })
+    @MaxLength(20, {
+        message: 'Le mot de passe doit avoir au minimum 20 caractéres !',
+      })
+    @MinLength(4, {
+        message: 'Le mot de passe doit avoir au minimum 4 caractéres !',
+    })
     @HideField()
     motDePasse: string;
+
+    @BeforeInsert()
+    async hashPassword?(){
+        this.motDePasse = await bcrypt.hash(this.motDePasse,10);
+    }
 
     @Column({
         type: "enum",
@@ -70,20 +93,5 @@ export class Collaborateur extends Personne{
     @OneToMany(()=>Notification, notification=>notification.collaborateur)
     @Field(type=>[Notification],{nullable:true})
     notifications?: Notification[];
-
-    // @OneToOne(type=>Cv, cv=>cv.collaborateur, {cascade: true, onDelete: "CASCADE" })
-    // @JoinColumn()
-    // @Field(type => Cv)
-    // public cv :Cv;
-
-    // @Column()
-    // @Field(type => Int)
-    // public cvId: number;
-
-
-    // @BeforeInsert()
-    // async hashPassword(){
-    //     this.mot_de_passe = await bcrypt.hash(this.mot_de_passe,10);
-    // }
 
 }

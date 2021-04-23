@@ -9,6 +9,7 @@ import { NotificationModule } from './notification/notification.module';
 import { EntretienModule } from './entretien/entretien.module';
 import { CvModule } from './cv/cv.module';
 import { CandidatModule } from './candidat/candidat.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { CandidatModule } from './candidat/candidat.module';
     NotificationModule,
     EntretienModule,
     CvModule,
-    CandidatModule
+    CandidatModule,
+    AuthModule
     ],
   controllers: [AppController],
   providers: [AppService],
