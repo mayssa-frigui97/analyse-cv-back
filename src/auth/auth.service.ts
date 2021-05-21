@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Collaborateur } from './../collaborateur/entities/collaborateur.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
+import { error } from 'console';
 
 @ObjectType()
 export class Connexion{
@@ -88,15 +89,15 @@ export class AuthService {
       .addSelect('collaborateur.motDePasse')
       .where('collaborateur.nomUtilisateur = :nomUtilisateur', { nomUtilisateur })
       .getOne();
-      person.motDePasse = await bcrypt.hash(person.motDePasse,10);
-      console.log("res:",person)
+      console.log("person:",person)
       if (!person) {
         // throw new NotFoundException('nom utilisateur erroné');
+        console.log('nom utilisateur erroné');
         return new GraphQLError('nom utilisateur erroné');
       }
+      person.motDePasse = await bcrypt.hash(person.motDePasse,10);
     //   const isSame =await motDePasse ==res.motDePasse
       const isSame = await bcrypt.compare(motDePasse, person.motDePasse);
-
       console.log("issame:",isSame)
       return person && (isSame)
         ? this.getToken(nomUtilisateur, person.id).then((result) => result)
@@ -150,7 +151,7 @@ export class AuthService {
     try {
       const person = await this.collaborateurService.findColByUsername(nomUtilisateur);
       const token = await this.jwtService.signAsync({ nomUtilisateur, id });
-      console.log('username:', nomUtilisateur, 'id:', id, 'token:', token,"person:",person);
+      console.log('username:', nomUtilisateur, 'id:', id, 'token:', token);
       return {
         "access_token": token,
         "user": person

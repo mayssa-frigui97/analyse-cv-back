@@ -213,4 +213,29 @@ export class CvResolver {
   ) {
     return this.cvService.updateAct(idAct, updateActAssocInput);
   }
+
+  @Query((returns) => Boolean)
+  getCvsMail():Promise<boolean> {
+    return this.cvService.getCvsMail();
+  }
+
+  // @Query((returns) => Boolean)
+  // extractCv(@Args('cv', { type: () => String }) cv: string):Promise<boolean> {
+  //   return this.cvService.extractCv(cv);
+  // }
+
+  @Query((returns) => Boolean)
+  extractCv():Promise<boolean> {
+    return this.cvService.extractCv();
+  }
+
+  @Query((returns) => Boolean)
+  getTextPdf():Promise<boolean> {
+    return this.cvService.getTextPdf();
+  }
+
+  @Query((returns) => Boolean)
+  extractCvAPI():Promise<boolean> {
+    return this.cvService.extractCvAPI();
+  }
 }

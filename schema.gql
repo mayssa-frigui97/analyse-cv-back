@@ -236,6 +236,10 @@ type Query {
   findLangue(idLang: Int!): Langue!
   findActs: [ActiviteAssociative!]!
   findAct(idAct: Int!): ActiviteAssociative!
+  getCvsMail: Boolean!
+  extractCv: Boolean!
+  getTextPdf: Boolean!
+  extractCvAPI: Boolean!
   findCandidats: [Candidat!]!
   findCandidat(idCand: Int!): Candidat!
   findFilterCands(selectedComp: [String!], selectedPoste: [String!], selectedUniver: [String!], selectedSpec: [String!], selectedNiv: [String!]): [Candidat!]!
