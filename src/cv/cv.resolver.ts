@@ -235,7 +235,7 @@ export class CvResolver {
   }
 
   @Query((returns) => Boolean)
-  extractCvAPI():Promise<boolean> {
-    return this.cvService.extractCvAPI();
+  addCvs():Promise<boolean> {
+    return this.cvService.addCvs();
   }
 }

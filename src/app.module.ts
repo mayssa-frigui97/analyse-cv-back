@@ -19,7 +19,7 @@ import { AuthModule } from './auth/auth.module';
       port: 3306,
       username: 'root',
       password: '',
-      database: 'analyse cvs',
+      database: 'analyse',
       entities: ["dist/**/*.entity{.ts,.js}"],
       synchronize: true,
     }),

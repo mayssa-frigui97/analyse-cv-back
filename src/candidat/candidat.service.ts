@@ -7,6 +7,7 @@ import { UpdateCandidatInput } from './dto/update-candidat.input';
 import { Repository } from 'typeorm';
 import { Cv } from './../cv/entities/cv.entity';
 import { Personne } from './entities/personne.entity';
+import { CreatePersonneInput } from 'src/candidat/dto/create-personne.input';
 
 @Injectable()
 export class CandidatService {
@@ -55,8 +56,9 @@ export class CandidatService {
   }
 
   async createCandidat(createCandidatInput: CreateCandidatInput): Promise<Candidat>{
+    //const newPer = this.personneRepository.create(createCandidatInput.createPersonneInput);
     const newCandidat = this.candidatRepository.create(createCandidatInput);
-    // const newPersonne= this.personneRepository.create(createCandidatInput.)
+    //this.personneRepository.save(newPer);
     return this.candidatRepository.save(newCandidat);
   }
 

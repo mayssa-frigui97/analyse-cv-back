@@ -44,7 +44,7 @@ export class AuthService {
     nomUtilisateur: string,
     motDePasse: string,
   ): Promise<Collaborateur | null> {
-    const user = await this.collaborateurService.findByUsername(nomUtilisateur);
+    const user = await this.collaborateurService.findColByUsername(nomUtilisateur);
 
     if (!user) {
       return null;
@@ -70,7 +70,7 @@ export class AuthService {
       secret: jwtConstants.secret,
     });
 
-    const user = this.collaborateurService.findByUsername(
+    const user = this.collaborateurService.findColByUsername(
       decoded.nomUtilisateur,
     );
 

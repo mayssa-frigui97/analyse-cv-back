@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { IsEmail } from 'class-validator';
+import { IsEmail, IsOptional } from 'class-validator';
 import { Cv } from '../../cv/entities/cv.entity';
 import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, TableInheritance, Unique } from 'typeorm';
 import { Candidature } from './candidature.entity';
@@ -20,22 +20,20 @@ export class Personne {
     @Field()
     prenom:string;
 
-    @Index({ unique: true })
     @Column()
-    @Field()
-    cin: number;
-
-    @Column()
-    @Field()
+    @IsOptional()
+    @Field({nullable:true})
     dateNaiss: Date;
 
     @Column()
+    @IsOptional()
     @Field({nullable:true})
     adresse?: string;
 
     @Index({ unique: true })
     @Column()
-    @Field()
+    @IsOptional()
+    @Field({nullable:true})
     tel: number;
 
     @Index({ unique: true })
@@ -45,6 +43,7 @@ export class Personne {
     email: string;
 
     @Column()
+    @IsOptional()
     @Field({nullable:true})
     avatar?: string;
 

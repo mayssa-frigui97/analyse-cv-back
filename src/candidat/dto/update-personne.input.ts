@@ -5,11 +5,6 @@ import { UpdateCvInput } from 'src/cv/dto/update-cv.input';
 
 @InputType()
 export class UpdatePersonneInput extends PartialType(CreatePersonneInput) {
-    @IsOptional()
-    @IsInt()
-    @Field(type => Int,{nullable:true})
-    cin: number;
-
     @IsString()
     @IsAlpha()
     @IsOptional()

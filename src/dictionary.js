@@ -182,10 +182,6 @@ module.exports = {
         });
       },
     ],
-    'facebook.com',
-    'instagram.com',
-    'bitbucket.org',
-    'stackoverflow.com',
   ],
   inline: {
     skype: 'skype',
@@ -195,6 +191,7 @@ module.exports = {
     email: [/([A-Za-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})/],
     phone: [/(?:\+?(\d{1,3}))?[. (]*(\d{2,3})[. )]*(\d{3})[. ]*(\d{3})(?: *x(\d+))?/],
     etatCivil: [/celibataire|fiancée|marié|célibataire|Célibataire|Fiancée/],
+    // langues: [/Arabe|Anglais|Francais|Français|Espagnol|Allemand|Chinois|Italien|Hindi|Russe|Portugais|Bengali|Japonais|Coréen|Turc|Roumain|arabe|anglais|francais|français|espagnol|allemand|chinois|italien|hindi|russe|portugais|bengali|japonais|coréen|turc|roumain/],
     // adresse: [/(\d{1,}) [a-zA-Z0-9\s]+(\.)? [a-zA-Z0-9]/],
     dateBirdh: [/([0-3][0-9])[- /.]([0-1][0-9])[- /.]([1-2][0-9]{3})/],
   },

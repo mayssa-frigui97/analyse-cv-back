@@ -19,6 +19,7 @@ import { Personne } from '../candidat/entities/personne.entity';
   
 TypeOrmModule.forFeature([Cv,Certificat,Competence,Experience,Formation,Langue,ActiviteAssociative]),
   // forwardRef(() => CandidatModule)
+  CandidatModule
 ],
   providers: [CvResolver, CvService],
   exports:[CvService]

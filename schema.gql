@@ -122,10 +122,9 @@ type Personne {
   id: Int!
   nom: String!
   prenom: String!
-  cin: Float!
-  dateNaiss: DateTime!
+  dateNaiss: DateTime
   adresse: String
-  tel: Float!
+  tel: Float
   email: String!
   avatar: String
   cv: Cv!
@@ -137,10 +136,9 @@ type Collaborateur {
   id: Int!
   nom: String!
   prenom: String!
-  cin: Float!
-  dateNaiss: DateTime!
+  dateNaiss: DateTime
   adresse: String
-  tel: Float!
+  tel: Float
   email: String!
   avatar: String
   cv: Cv!
@@ -185,10 +183,9 @@ type Candidat {
   id: Int!
   nom: String!
   prenom: String!
-  cin: Float!
-  dateNaiss: DateTime!
+  dateNaiss: DateTime
   adresse: String
-  tel: Float!
+  tel: Float
   email: String!
   avatar: String
   cv: Cv!
@@ -239,7 +236,7 @@ type Query {
   getCvsMail: Boolean!
   extractCv: Boolean!
   getTextPdf: Boolean!
-  extractCvAPI: Boolean!
+  addCvs: Boolean!
   findCandidats: [Candidat!]!
   findCandidat(idCand: Int!): Candidat!
   findFilterCands(selectedComp: [String!], selectedPoste: [String!], selectedUniver: [String!], selectedSpec: [String!], selectedNiv: [String!]): [Candidat!]!
@@ -276,7 +273,6 @@ type Mutation {
 }
 
 input CreateColInput {
-  cin: Int
   prenom: String!
   nom: String!
   dateNaiss: DateTime!
@@ -298,7 +294,6 @@ input CreateColInput {
 }
 
 input UpdateColInput {
-  cin: Int
   prenom: String
   nom: String
   dateNaiss: DateTime
@@ -401,7 +396,6 @@ input UpdateActAssocInput {
 }
 
 input CreateCandidatInput {
-  cin: Int
   prenom: String!
   nom: String!
   dateNaiss: DateTime!
@@ -414,7 +408,6 @@ input CreateCandidatInput {
 }
 
 input UpdateCandidatInput {
-  cin: Int
   prenom: String
   nom: String
   dateNaiss: DateTime

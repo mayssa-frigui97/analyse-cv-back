@@ -3,9 +3,16 @@ import { Field, Int, InputType} from '@nestjs/graphql';
 import { IsAlpha, IsAlphanumeric, IsDate, IsInt, IsNumber, IsOptional, IsString, MaxLength, MinLength, IsEmail } from 'class-validator';
 import { UpdateEquipeInput } from './update-equipe.input';
 import { UpdatePersonneInput } from '../../candidat/dto/update-personne.input';
+import { Index } from 'typeorm';
 
 @InputType()//representation mta3 input = dto
 export class UpdateColInput extends UpdatePersonneInput {
+
+    // @IsNumber()
+    // // @Index({ unique: true })
+    // @IsOptional()
+    // @Field(type => Int)
+    // cin: number;
 
     @IsOptional()
     @IsInt()

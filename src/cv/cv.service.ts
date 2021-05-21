@@ -19,6 +19,9 @@ import { UpdateCompetenceInput } from './dto/update-competence-input';
 import Pdf from './pdfExport';
 import { readFile, writeFile , readdir} from 'fs';
 import { fromPath } from "pdf2pic";
+import { StatutCV } from 'src/enum/StatutCV';
+import { CandidatService } from './../candidat/candidat.service';
+import { CreateCandidatInput } from 'src/candidat/dto/create-candidat.input';
 
 
 // var Imap = require('imap'),
@@ -140,11 +143,37 @@ export class CvService {
     private langueRepository: Repository<Langue>,
     @InjectRepository(ActiviteAssociative)
     private actRepository: Repository<ActiviteAssociative>,
+    private candidatService : CandidatService
   ) {}
 
   /***************Cv*********/
 
-  async extractCvAPI():Promise<boolean>{
+  async addCvs():Promise<boolean>{
+    let directory_name = 'files/compiledFiles/';
+    await readdir(directory_name, (err,files) => {
+      if (err) throw err;
+      console.log('******Répertoire: ',directory_name,"*****files:",files);
+      for (const file of files){
+        let rawdata = fs.readFileSync(directory_name+ file);
+        let output = JSON.parse(rawdata);
+        var createcvinput = new CreateCvInput();
+        createcvinput.statutCV=StatutCV.RECU;
+        createcvinput.cmptLinkedin= output.profiles;
+        this.createCV(createcvinput).then((cv)=>{
+          console.log("cv create:",cv);
+          var createperinput = new CreateCandidatInput();
+          createperinput.nom=output.name;
+          createperinput.email= output.email;
+          createperinput.tel= output.phone;
+          createperinput.dateNaiss = output.dateBirth;
+          createperinput.adresse = output.address;
+          createperinput.cvId = cv.id;
+          this.candidatService.createCandidat(createperinput);
+          console.log("perinput:",createperinput);
+          })
+        console.log("cvinput:",createcvinput);
+      }
+    });
     return true;
   }
   // async extractImg(): Promise<boolean> {
@@ -195,18 +224,8 @@ export class CvService {
     return true;
   }
 
+
   async extractCv(): Promise<boolean> {
-    // From file to file
-    // const inputFile= "files/Alice Clark CV.pdf";
-    // const outputDir = 'files/compiledFiles';
-    // ResumeParser.parseResumeFile('files/cvs/' + inputFile, outputDir) // input file, output dir
-    //   .then((file) => {
-    //     console.log('Yay! ' + file);
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //   });
-    // return true;
     let inputDir = 'files/cvs/';
     let outputDir = 'files/compiledFiles'; 
     await readdir(inputDir, (err, files) => 

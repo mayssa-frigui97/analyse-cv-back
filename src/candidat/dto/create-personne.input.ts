@@ -4,10 +4,6 @@ import { Cv } from '../../cv/entities/cv.entity';
 
 @InputType()
 export class CreatePersonneInput {
-    @IsOptional()
-    @IsInt()
-    @Field(type => Int,{nullable:true})
-    cin: number;
 
     @IsString()
     @IsNotEmpty()
