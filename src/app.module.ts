@@ -8,8 +8,8 @@ import { CollaborateurModule } from './collaborateur/collaborateur.module';
 import { NotificationModule } from './notification/notification.module';
 import { EntretienModule } from './entretien/entretien.module';
 import { CvModule } from './cv/cv.module';
-import { CandidatModule } from './candidat/candidat.module';
 import { AuthModule } from './auth/auth.module';
+import { PersonneModule } from './candidat/personne.module';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { AuthModule } from './auth/auth.module';
       port: 3306,
       username: 'root',
       password: '',
-      database: 'analyse',
+      database: 'analyse des cvs',
       entities: ["dist/**/*.entity{.ts,.js}"],
       synchronize: true,
     }),
@@ -30,7 +30,7 @@ import { AuthModule } from './auth/auth.module';
     NotificationModule,
     EntretienModule,
     CvModule,
-    CandidatModule,
+    PersonneModule,
     AuthModule
     ],
   controllers: [AppController],

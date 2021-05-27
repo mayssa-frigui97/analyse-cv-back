@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { IsEmail, IsOptional } from 'class-validator';
+import { IsBoolean, IsDate, IsEmail, IsNumberString, IsOptional } from 'class-validator';
 import { Cv } from '../../cv/entities/cv.entity';
 import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, TableInheritance, Unique } from 'typeorm';
 import { Candidature } from './candidature.entity';
@@ -17,24 +17,25 @@ export class Personne {
     nom:string;
 
     @Column()
-    @Field()
-    prenom:string;
+    @IsOptional()
+    @Field({nullable:true})
+    etatCivil:string;
 
     @Column()
     @IsOptional()
+    @IsDate()
     @Field({nullable:true})
-    dateNaiss: Date;
+    dateNaiss?: Date;
 
     @Column()
     @IsOptional()
     @Field({nullable:true})
     adresse?: string;
 
-    @Index({ unique: true })
     @Column()
     @IsOptional()
     @Field({nullable:true})
-    tel: number;
+    tel?: string;
 
     @Index({ unique: true })
     @Column()
@@ -46,6 +47,11 @@ export class Personne {
     @IsOptional()
     @Field({nullable:true})
     avatar?: string;
+
+    @Column({default: false})
+    @IsBoolean()
+    @Field(()=>Boolean)
+    recommande: boolean;
 
     @OneToOne(type => Cv, cv => cv.personne, {cascade: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
     @JoinColumn()

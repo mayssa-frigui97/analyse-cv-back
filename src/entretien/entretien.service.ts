@@ -17,13 +17,7 @@ export class EntretienService {
         query
         .leftJoinAndSelect('entretien.candidature', 'candidature')
         .leftJoinAndSelect('candidature.personne','personne')
-        .leftJoinAndSelect('personne.cv','cv')
-        .leftJoinAndSelect('cv.langues','langues')
-        .leftJoinAndSelect('cv.formations','formations')
-        .leftJoinAndSelect('cv.experiences','experiences')
-        .leftJoinAndSelect('cv.competences','competences')
-        .leftJoinAndSelect('cv.certificats','certificats')
-        .leftJoinAndSelect('cv.activiteAssociatives','activiteAssociatives');
+        .leftJoinAndSelect('personne.cv','cv');
         return query.getMany();
     }
 
@@ -33,13 +27,7 @@ export class EntretienService {
         query.where('entretien.id= :id',{id})
         .leftJoinAndSelect('entretien.candidature', 'candidature')
         .leftJoinAndSelect('candidature.personne','personne')
-        .leftJoinAndSelect('personne.cv','cv')
-        .leftJoinAndSelect('cv.langues','langues')
-        .leftJoinAndSelect('cv.formations','formations')
-        .leftJoinAndSelect('cv.experiences','experiences')
-        .leftJoinAndSelect('cv.competences','competences')
-        .leftJoinAndSelect('cv.certificats','certificats')
-        .leftJoinAndSelect('cv.activiteAssociatives','activiteAssociatives');
+        .leftJoinAndSelect('personne.cv','cv');
         return query.getOne();
     }
 }

@@ -1,8 +1,10 @@
 {
     "name": "Siwar MEZZI",
+    "address": "31 avenue jean mermoz\nLyon 8éme arrondissement",
     "email": "mezzi.siwar97@gmail.com",
+    "phone":"06 09 35 74 31",
     "education": "Master informatique en Business Intelligence et Big Data\nUniversité de lumière lyon 2 Bron, France\nLicence fondamentale en Sciences de l'informatique\nFaculté des sciences de Bizerte Tunisie\nBaccalauréat en mathématique\nLycée farhad hached Bizerte, Tunisie",
     "experience": "Consultante décisionnel - Business Intelligence\nUMANIS Lyon, France\nSolution : Oracle SQL Developer, SSIS, SQL Server, TSQL\nDéveloppement de tableaux de bords de suivi de la\nperformance commerciale et nancière\nSociété Tunisienne de Banque, Tunisie\nSolution : Oracle SQL Developer, Suite microsoft( SSIS, SSAS,\nSSRS), Power BI\nDéveloppement d'un système d'aide à la décision au service\nmarketing d'un centre de formation\n( Stage de n d'étude ) FormaPro Bizerte, Tunisie\nSolution : JEE, Protégé, RDF, OWL, SPARQL,\nSWRL,Bootstrap, Html5, CSS3, PHP, Ajax, JQuery, JavaScript,\nSQL\nDéveloppement d'une application web de gestion d'un centre\nde formation profesionnelle\n(Stage d'été ) FormaPro Bizerte, Tunisie\nSolution : Bootstrap, Html5, CSS3, PHP, Ajax, JQuery,\nJavaScript, SQL",
-    "skills": "Suite Microsoft (SSIS, SSAS, SSRS), Talend , Qlikview, Qlik\nSense, Power BI, Tableau\nMangodb, Cassandra, SQLServer, MySQL\nUML\nProtégé\nOWL, RDF, SPARQL, SWRl\nNetbeans, Eclipse, Visual Studio 2016, AndroidStudio,\nRstudio, dbForge Studio\nR, C, .Net, VB, Java/JEE, HTML5, PHP5, CSS3, Javascript,\nJquery, Ajax, XML, SQL, PL/PgSQL\nFramework : Laravel 5, Symphony 2.7\nCMS : WordPress 4.5\nMobile : Android\nLatex , Ms O ce 2016\nWindows, Linux (Ubuntu)",
+    "skills": "Suite Microsoft (SSIS, SSAS, SSRS), Talend , Qlikview, Qlik\nSense, Power BI, Tableau\nMangodb, Cassandra, SQLServer, MySQL\nUML\nProtégé\nOWL, RDF, SPARQL, SWRl\nNetbeans, Eclipse, Visual Studio 2016, AndroidStudio,\nRstudio, dbForge Studio\nR, C, .Net, VB, Java, JEE, HTML5, PHP5, CSS3, Javascript,\nJquery, Ajax, XML, SQL, PL/PgSQL\nFramework : Laravel 5, Symphony 2.7\nCMS : WordPress 4.5\nMobile : Android\nLatex , Ms O ce 2016\nWindows, Linux (Ubuntu)",
     "languages": "Français\nAnglais\nEspagnol\nArabe"
 }

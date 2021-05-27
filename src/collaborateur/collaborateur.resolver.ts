@@ -26,7 +26,7 @@ export class CollaborateurResolver {
   findCols(
     @Args('pole', { type: () => Int, nullable: true }) pole?: number,
   ): Promise<Collaborateur[]> {
-    return this.collaborateurService.findAllCol(pole);
+    return this.collaborateurService.findAllCols(pole);
   }
 
   @Query((returns) => Collaborateur, { nullable: true })
@@ -65,12 +65,12 @@ export class CollaborateurResolver {
     selectedPoles?: number[],
     @Args('selectedEquipes', { type: () => [Int], nullable: true })
     selectedEquipes?: number[],
-    @Args('selectedNiv', { type: () => [String], nullable: true })
-    selectedNiv?: string[],
-    @Args('selectedSpec', { type: () => [String], nullable: true })
-    selectedSpec?: string[],
-    @Args('selectedUniver', { type: () => [String], nullable: true })
-    selectedUniver?: string[],
+    // @Args('selectedNiv', { type: () => [String], nullable: true })
+    // selectedNiv?: string[],
+    // @Args('selectedSpec', { type: () => [String], nullable: true })
+    // selectedSpec?: string[],
+    // @Args('selectedUniver', { type: () => [String], nullable: true })
+    // selectedUniver?: string[],
     @Args('selectedPoste', { type: () => [String], nullable: true })
     selectedPoste?: string[],
     @Args('selectedComp', { type: () => [String], nullable: true })
@@ -79,9 +79,6 @@ export class CollaborateurResolver {
     return this.collaborateurService.getFilterCols(
       selectedPoles,
       selectedEquipes,
-      selectedNiv,
-      selectedSpec,
-      selectedUniver,
       selectedPoste,
       selectedComp,
     );
@@ -151,5 +148,10 @@ export class CollaborateurResolver {
     @Args('idPoles', { type: () => [Int] }) idPoles: number[],
   ): Promise<Equipe[]> {
     return this.collaborateurService.findEquipesPoles(idPoles);
+  }
+
+  @Query(() => [Collaborateur], { name: 'findPostes' })
+  findPostes() {
+    return this.collaborateurService.findPostes();
   }
 }

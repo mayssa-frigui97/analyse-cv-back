@@ -1,5 +1,5 @@
 import { InputType, Int, Field } from '@nestjs/graphql';
-import { IsAlpha, IsDate, IsEmail, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsAlpha, IsBoolean, IsDate, IsEmail, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Cv } from '../../cv/entities/cv.entity';
 
 @InputType()
@@ -7,29 +7,28 @@ export class CreatePersonneInput {
 
     @IsString()
     @IsNotEmpty()
-    @IsAlpha()
-    @Field()
-    prenom:string;
-
-    @IsString()
-    @IsNotEmpty()
     @Field()
     nom:string;
 
+    @IsString()
+    @IsOptional()
+    @Field({nullable:true})
+    etatCivil?:string;
+
     @IsDate()
-    @IsNotEmpty()
-    @Field()
-    dateNaiss: Date;
+    @IsOptional()
+    @Field({nullable:true})
+    dateNaiss?: Date;
 
     @IsString()
     @IsOptional()
     @Field({nullable:true})
     adresse?: string;
 
-    @IsInt()
+    @IsString()
     @IsNotEmpty()
-    @Field(type => Int)
-    tel: number;
+    @Field({nullable:true})
+    tel?: string;
 
     @IsNotEmpty()
     @Field()
@@ -39,6 +38,11 @@ export class CreatePersonneInput {
     @IsOptional()
     @Field({nullable:true})
     avatar?: string;
+
+    @IsNotEmpty()
+    @IsBoolean()
+    @Field(type => Boolean,{nullable:true})
+    recommande?: boolean;
 
     @IsNumber()
     @IsOptional()

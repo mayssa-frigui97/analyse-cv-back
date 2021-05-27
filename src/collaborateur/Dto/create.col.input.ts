@@ -1,6 +1,7 @@
 import { Field, Int, InputType, ID } from '@nestjs/graphql';
 import { IsAlpha, IsAlphanumeric, IsDate, IsEmail, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
 import { CreatePersonneInput } from 'src/candidat/dto/create-personne.input';
+import { UserPermission } from 'src/enum/UserPermission';
 import { Index } from 'typeorm';
 import { UserRole } from '../../enum/UserRole';
 import { Equipe } from './../entities/equipe.entity';
@@ -8,11 +9,11 @@ import { Equipe } from './../entities/equipe.entity';
 @InputType()//representation mta3 input = dto
 export class CreateColInput extends CreatePersonneInput{
 
-    // @IsNumber()
-    // // @Index({ unique: true })
-    // @IsNotEmpty()
-    // @Field(type => Int)
-    // cin: number;
+    @IsNumber()
+    @Index({ unique: true })
+    @IsNotEmpty()
+    @Field(type => Int)
+    cin: number;
 
     @IsOptional()
     @IsInt()
@@ -62,6 +63,10 @@ export class CreateColInput extends CreatePersonneInput{
     @IsNotEmpty()
     @Field(type => UserRole)
     role: UserRole;
+
+    @IsNotEmpty()
+    @Field(type=> UserPermission)
+    permission: UserPermission;
 
     @Max(5, {
       message: 'Evaluation max=5',

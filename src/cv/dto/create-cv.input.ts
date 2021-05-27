@@ -10,26 +10,45 @@ export class CreateCvInput {
     @Field({nullable:true})
     cmptLinkedin?:string;
 
-    @IsString()
-    @IsOptional()
-    @Field({nullable:true})
-    cmptGithub?:string;
-
-    @IsString()
-    @IsOptional()
-    @Field({nullable:true})
-    posteAct?:string;
-
-    @IsString()
-    @IsOptional()
-    @Field({nullable:true})
-    description?:string;
-
     @IsNotEmpty()
     @Field()
     statutCV: StatutCV;
 
-    // @IsNotEmpty()
-    // @Field(type => Candidat)
-    // candidat :Candidat;
+    @IsOptional()
+    @IsString()
+    @Field({nullable:true})
+    activiteAssociatives?: string;
+
+    @IsOptional()
+    @IsString()
+    @Field({nullable:true})
+    certificats?: string;
+    
+    @IsOptional()
+    @IsString()
+    @Field({nullable:true})
+    experiences?: string;
+    
+    @IsOptional()
+    @IsString()
+    @Field({nullable:true})
+    formations?: string;
+
+    @IsOptional()
+    @IsString()
+    @Field({nullable:true})
+    projets?: string;
+
+    @IsOptional()
+    @IsString()
+    @Field({nullable:true})
+    interets?: string;
+    
+    @IsOptional()
+    @Field(type => [String],{nullable:true})
+    competences?:string[];
+
+    @IsOptional()
+    @Field(type => [String],{nullable:true})
+    langues?: string[];
 }

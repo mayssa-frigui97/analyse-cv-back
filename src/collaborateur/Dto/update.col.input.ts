@@ -4,15 +4,16 @@ import { IsAlpha, IsAlphanumeric, IsDate, IsInt, IsNumber, IsOptional, IsString,
 import { UpdateEquipeInput } from './update-equipe.input';
 import { UpdatePersonneInput } from '../../candidat/dto/update-personne.input';
 import { Index } from 'typeorm';
+import { UserPermission } from 'src/enum/UserPermission';
 
 @InputType()//representation mta3 input = dto
 export class UpdateColInput extends UpdatePersonneInput {
 
-    // @IsNumber()
-    // // @Index({ unique: true })
-    // @IsOptional()
-    // @Field(type => Int)
-    // cin: number;
+    @IsNumber()
+    @Index({ unique: true })
+    @IsOptional()
+    @Field(type => Int,{nullable:true})
+    cin?: number;
 
     @IsOptional()
     @IsInt()
@@ -59,10 +60,13 @@ export class UpdateColInput extends UpdatePersonneInput {
     @Field({nullable:true})
     motDePasse?: string;
 
-    @IsNumber()
     @IsOptional()
     @Field(type=> UserRole,{nullable:true})
     role?: UserRole;
+
+    @IsOptional()
+    @Field(type=> UserPermission,{nullable:true})
+    permission?: UserPermission;
 
     @MaxLength(5, {
       message: 'Evaluation max=5',

@@ -27,84 +27,84 @@ module.exports = {
     interests: ['interests',"centre d'interet","centre d'intérêt",'passions'],
   },
   profiles: [
-    [
-      'github.com',
-      function(url, Resume, profilesWatcher) {
-        download(url, function(data, err) {
-          if (data) {
-            var $ = cheerio.load(data),
-              fullName = $('.vcard-fullname').text(),
-              location = $('.octicon-location')
-                .parent()
-                .text(),
-              mail = $('.octicon-mail')
-                .parent()
-                .text(),
-              link = $('.octicon-link')
-                .parent()
-                .text(),
-              clock = $('.octicon-clock')
-                .parent()
-                .text(),
-              company = $('.octicon-organization')
-                .parent()
-                .text();
+    // [
+    //   'github.com',
+    //   function(url, Resume, profilesWatcher) {
+    //     download(url, function(data, err) {
+    //       if (data) {
+    //         var $ = cheerio.load(data),
+    //           fullName = $('.vcard-fullname').text(),
+    //           location = $('.octicon-location')
+    //             .parent()
+    //             .text(),
+    //           mail = $('.octicon-mail')
+    //             .parent()
+    //             .text(),
+    //           link = $('.octicon-link')
+    //             .parent()
+    //             .text(),
+    //           clock = $('.octicon-clock')
+    //             .parent()
+    //             .text(),
+    //           company = $('.octicon-organization')
+    //             .parent()
+    //             .text();
 
-            Resume.addObject('github', {
-              name: fullName,
-              location: location,
-              email: mail,
-              link: link,
-              joined: clock,
-              company: company,
-            });
-          } else {
-            return console.log(err);
-          }
-          //profilesInProgress--;
-          profilesWatcher.inProgress--;
-        });
-      },
-    ],
-    [
-      'gitlab.com',
-      function(url, Resume, profilesWatcher) {
-        download(url, function(data, err) {
-          if (data) {
-            var $ = cheerio.load(data),
-              fullName = $('.vcard-fullname').text(),
-              location = $('.octicon-location')
-                .parent()
-                .text(),
-              mail = $('.octicon-mail')
-                .parent()
-                .text(),
-              link = $('.octicon-link')
-                .parent()
-                .text(),
-              clock = $('.octicon-clock')
-                .parent()
-                .text(),
-              company = $('.octicon-organization')
-                .parent()
-                .text();
+    //         Resume.addObject('github', {
+    //           name: fullName,
+    //           location: location,
+    //           email: mail,
+    //           link: link,
+    //           joined: clock,
+    //           company: company,
+    //         });
+    //       } else {
+    //         return console.log(err);
+    //       }
+    //       //profilesInProgress--;
+    //       profilesWatcher.inProgress--;
+    //     });
+    //   },
+    // ],
+    // [
+    //   'gitlab.com',
+    //   function(url, Resume, profilesWatcher) {
+    //     download(url, function(data, err) {
+    //       if (data) {
+    //         var $ = cheerio.load(data),
+    //           fullName = $('.vcard-fullname').text(),
+    //           location = $('.octicon-location')
+    //             .parent()
+    //             .text(),
+    //           mail = $('.octicon-mail')
+    //             .parent()
+    //             .text(),
+    //           link = $('.octicon-link')
+    //             .parent()
+    //             .text(),
+    //           clock = $('.octicon-clock')
+    //             .parent()
+    //             .text(),
+    //           company = $('.octicon-organization')
+    //             .parent()
+    //             .text();
 
-            Resume.addObject('gitlab', {
-              name: fullName,
-              location: location,
-              email: mail,
-              link: link,
-              joined: clock,
-              company: company,
-            });
-          } else {
-            return console.log(err);
-          }
-          //profilesInProgress--;
-          profilesWatcher.inProgress--;
-        });
-      },
-    ],
+    //         Resume.addObject('gitlab', {
+    //           name: fullName,
+    //           location: location,
+    //           email: mail,
+    //           link: link,
+    //           joined: clock,
+    //           company: company,
+    //         });
+    //       } else {
+    //         return console.log(err);
+    //       }
+    //       //profilesInProgress--;
+    //       profilesWatcher.inProgress--;
+    //     });
+    //   },
+    // ],
     [
       'linkedin.com',
       function(url, Resume, profilesWatcher) {
@@ -187,13 +187,17 @@ module.exports = {
     skype: 'skype',
   },
   regular: {
-    name: [/([A-Z][a-z]{2,})[ ]([A-Z]{3,})|([A-Z]{3,})[ ]([A-Z][a-z]{2,})|([A-Z][a-z]{2,})[ ]([A-Z][a-z]{2,})|([A-Z]{3,})[ ]([A-Z]{3,})/],
+    name: [/([A-Z][a-z]{6})[ ]([A-Z][a-z]{5})[ \n]([A-Z]{7})|([A-Z][a-z]{2,})[ ]([A-Z]{3,})|([A-Z]{3,})[ ]([A-Z][a-z]{2,})|([A-Z][a-z]{2,})[ ]([A-Z][a-z]{2,})|([A-Z]{3,})[ ]([A-Z]{3,})/],//
     email: [/([A-Za-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})/],
-    phone: [/(?:\+?(\d{1,3}))?[. (]*(\d{2,3})[. )]*(\d{3})[. ]*(\d{3})(?: *x(\d+))?/],
+    phone: [/([ (]?(?:\+(\d{1,3}))?[. (]*(\d{2,3})[. )]*(\d{2,3})[. ]*(\d{2,3})[. ]*(\d{2})?)|((\d{2})[. ]*(\d{2})[. ]*(\d{2})[. ]*(\d{2})[. ]*(\d{2}))/],
+    // tel: [/(\d{2})[. ]*(\d{2})[. ]*(\d{2})[. ]*(\d{2})[. ]*(\d{2})/],
     etatCivil: [/celibataire|fiancée|marié|célibataire|Célibataire|Fiancée/],
     // langues: [/Arabe|Anglais|Francais|Français|Espagnol|Allemand|Chinois|Italien|Hindi|Russe|Portugais|Bengali|Japonais|Coréen|Turc|Roumain|arabe|anglais|francais|français|espagnol|allemand|chinois|italien|hindi|russe|portugais|bengali|japonais|coréen|turc|roumain/],
     // adresse: [/(\d{1,}) [a-zA-Z0-9\s]+(\.)? [a-zA-Z0-9]/],
     dateBirdh: [/([0-3][0-9])[- /.]([0-1][0-9])[- /.]([1-2][0-9]{3})/],
+    // linkedin: [/^www\.[a-z]{2,3}\.linkedin\.com\/.*$/],
+    // github: [/^linkedin\\.com\\.*$/],
+    // gitlab:[/http(s)?:\/\/([\w]+\.)?gitlab\.com\/in\/[A-z0-9_-]+\/?/]
   },
 };
 

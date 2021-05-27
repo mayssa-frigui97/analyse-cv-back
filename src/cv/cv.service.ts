@@ -1,27 +1,14 @@
 import { Repository } from 'typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ActiviteAssociative } from './entities/activite.associative.entity';
-import { Langue } from './entities/langue.entity';
-import { Formation } from './entities/formation.entity';
-import { Experience } from './entities/experience.entity';
-import { Competence } from './entities/competence.entity';
-import { Certificat } from './entities/certificat.entity';
 import { Cv } from './entities/cv.entity';
 import { CreateCvInput } from './dto/create-cv.input';
 import { UpdateCvInput } from './dto/update-cv.input';
-import { UpdateCertifInput } from './dto/update-certif-input';
-import { UpdateActAssocInput } from './dto/update-act-assoc-input';
-import { UpdateLangueInput } from './dto/update-langue-input';
-import { UpdateFormationInput } from './dto/update-formation-input';
-import { UpdateExperienceInput } from './dto/update-experience-input';
-import { UpdateCompetenceInput } from './dto/update-competence-input';
 import Pdf from './pdfExport';
 import { readFile, writeFile , readdir} from 'fs';
-import { fromPath } from "pdf2pic";
 import { StatutCV } from 'src/enum/StatutCV';
-import { CandidatService } from './../candidat/candidat.service';
-import { CreateCandidatInput } from 'src/candidat/dto/create-candidat.input';
+import { PersonneService } from 'src/candidat/personne.service';
+import { CreatePersonneInput } from 'src/candidat/dto/create-personne.input';
 
 
 // var Imap = require('imap'),
@@ -33,6 +20,8 @@ const { Base64Decode } = require('base64-stream');
 var Imap = require('node-imap');
 var pdf2img = require('pdf2img');
 const ResumeParser = require('./../../src');
+var gravatar = require('gravatar');
+var crypto=require('crypto');
 
 var imap = new Imap({
   user: 'analysecvtest@gmail.com',
@@ -131,23 +120,34 @@ export class CvService {
   constructor(
     @InjectRepository(Cv)
     private cvRepository: Repository<Cv>,
-    @InjectRepository(Certificat)
-    private certificatRepository: Repository<Certificat>,
-    @InjectRepository(Competence)
-    private competenceRepository: Repository<Competence>,
-    @InjectRepository(Experience)
-    private experienceRepository: Repository<Experience>,
-    @InjectRepository(Formation)
-    private formationRepository: Repository<Formation>,
-    @InjectRepository(Langue)
-    private langueRepository: Repository<Langue>,
-    @InjectRepository(ActiviteAssociative)
-    private actRepository: Repository<ActiviteAssociative>,
-    private candidatService : CandidatService
+    private personneService : PersonneService
   ) {}
 
   /***************Cv*********/
 
+  async getAvatar(email: string):Promise<String>{
+
+      const size = 200;
+      const defaults = 'retro';
+    
+      if (!email) {
+        return 'https://gravatar.com/avatar/?s=' + size + '&d=' + defaults;
+      }
+    
+      var md5 = crypto.createHash('md5').update(email);
+      return 'https://gravatar.com/avatar/' + md5.digest('hex').toString() + '?s=' + size + '&d=' + defaults;
+
+    // var result: string[];
+    // var url = gravatar.url(email, {s: '200', r: 'pg', d: '404'});
+    // var unsecureUrl = gravatar.url(email, {s: '100', r: 'x', d: 'retro'}, false);
+    // var Url = gravatar.url(email, {s: '100', r: 'x', d: 'retro'}, true);
+    // var httpUrl = gravatar.url(email, {protocol: 'http', s: '100'});
+    // var httpsUrl = gravatar.url(email, {protocol: 'https', s: '100'})
+    // var profile2 = gravatar.profile_url(email, {protocol: 'http', format:'qr'});
+    // result=url+unsecureUrl+Url+httpUrl+httpsUrl+profile2;
+    // console.log("result:",result,"url:",url)
+    // return url;
+  }
   async addCvs():Promise<boolean>{
     let directory_name = 'files/compiledFiles/';
     await readdir(directory_name, (err,files) => {
@@ -159,16 +159,175 @@ export class CvService {
         var createcvinput = new CreateCvInput();
         createcvinput.statutCV=StatutCV.RECU;
         createcvinput.cmptLinkedin= output.profiles;
+        createcvinput.activiteAssociatives=output.ActAssociatives;
+        createcvinput.experiences=output.experience;
+        createcvinput.formations=output.education;;
+        createcvinput.certificats=output.certification;
+        createcvinput.interets=output.interests;
+        createcvinput.projets=output.projects;
+        var skills0 = output.skills.split("\n(").join("(");
+        var skills1 = skills0.split(".\n").join(",");
+        var skills2 = skills1.split(",\n").join(",");//replaceAll("\n",",")
+        var skills3 = skills2.split("\n,").join(",");
+        var skills4 = skills3.split("\n").join(",");
+        var skills5 = skills4.split("▪ ").join("");
+        var skills6 = skills5.split("- ").join("");
+        var skills7 = skills6.split("...").join("");
+          var indice = skills7.indexOf("(")
+          console.log("indice",indice);
+          if(indice !== -1){
+            var indexe = skills7.indexOf(")")
+            console.log("indexe",indexe);
+            if(indexe !== -1){
+              var chaine= skills7.substring(indice,indexe+1);
+              var ind= chaine.indexOf(",");
+              if(ind !== -1){
+                console.log("--chaine",chaine);
+                var chaine = chaine.split(",").join("/");
+                console.log("--chaine contient () :",chaine);
+                skills7 = skills7.replace(skills7.substring(indice,indexe+1),chaine)
+                console.log("**skills contient () apres:",skills7);
+              }
+            }
+          }
+        var comps = skills7.split(",");
+        console.log("comps:",comps);
+        var C: string="";
+        for(var i = 0; i < comps.length; i++){
+          console.log("comp:",comps[i])
+          var index = comps[i].indexOf(": ");    
+          if(index !== -1){
+            console.log("c'est un T : C");
+            var x=comps[i].split(": ");
+            comps[i]=x[1];
+            if(i!=comps.length-1){
+              C=C+x[1]+",";
+            }
+            else{
+              C=C+x[1];
+            }
+            console.log("x[1]**",x[1])
+          }    
+          if(comps[i][0] == " "){
+            console.log("c'est un premier espace");
+            comps[i]=comps[i].replace(" ","");
+            console.log("comps[i]**",comps[i])
+          }
+          var indexe = comps[i].indexOf(":");    
+          if(indexe == comps[i].length-1){
+            console.log("c'est un T:");
+            console.log("comps[i].length-1**",comps[i].length-1)
+          }
+          if(index == -1 && indexe == -1){
+            if(i!=comps.length-1){
+              C=C+comps[i]+",";
+            }
+            else{
+              C=C+comps[i];
+            }
+          }
+          console.log("compétences**",C)
+        }
+        if(C.indexOf(".") == (C.length)-1){
+          console.log("--point final!")
+          C=C.slice(0, -1);
+          console.log("compétences**",C)
+        }
+        output.skills=C;
+        var competences = output.skills.split(" et ").join(",");
+        createcvinput.competences=competences;
+        var langues = output.languages.split("\n").join(",");
+        var langue = langues.split(" ▪ ").join("");
+        var parts=langue.split(",");
+        console.log("parts:",parts);
+        var L: string="";
+        for(var i = 0; i < parts.length; i++){
+          console.log("part:",parts[i])
+          var indexep = parts[i].indexOf(" : ");    
+          if(indexep !== -1){
+            console.log("c'est un :");
+            var x=parts[i].split(" :");
+            parts[i]=x[0];
+            if(i!=parts.length-1){
+              L=L+x[0]+",";
+            }
+            else{
+              L=L+x[0];
+            }
+            console.log("x[0]**",x[0])
+          }
+          var index = parts[i].indexOf(": ");    
+          if(index !== -1){
+            console.log("c'est un :");
+            var x=parts[i].split(":");
+            parts[i]=x[0];
+            if(i!=parts.length-1){
+              L=L+x[0]+",";
+            }
+            else{
+              L=L+x[0];
+            }
+            console.log("x[0]**",x[0])
+          }
+          var indexe = parts[i].indexOf(" ");    
+          if(indexe !== -1){
+            console.log("c'est un espace");
+            var x=parts[i].split(" ");
+            parts[i]=x[0];
+            if(i!=parts.length-1){
+              L=L+x[0]+",";
+            }
+            else{
+              L=L+x[0];
+            }
+            console.log("x[0]**",x[0])
+          }
+          var indexp = parts[i].indexOf("(");    
+          if(indexp !== -1){
+            console.log("c'est un (");
+            var x=parts[i].split("(");
+            parts[i]=x[0];
+            if(i!=parts.length-1){
+              L=L+x[0]+",";
+            }
+            else{
+              L=L+x[0];
+            }
+            console.log("x[0]**",x[0])
+          }
+          if(index == -1 && indexp == -1 && indexe == -1 && indexep == -1){
+            if(i!=parts.length-1){
+              L=L+parts[i]+",";
+            }
+            else{
+              L=L+parts[i];
+            }
+          }
+          console.log("langue**",L)
+        }
+        output.languages=L;
+        createcvinput.langues=output.languages;
+        console.log("langue :",createcvinput.langues)
         this.createCV(createcvinput).then((cv)=>{
           console.log("cv create:",cv);
-          var createperinput = new CreateCandidatInput();
+          var createperinput = new CreatePersonneInput();
           createperinput.nom=output.name;
           createperinput.email= output.email;
           createperinput.tel= output.phone;
-          createperinput.dateNaiss = output.dateBirth;
+          console.log("output.dateBirth:",output.datebirdh)
+          if(output.datebirdh){
+            var parts = output.datebirdh.split("/");
+            var date = new Date(parts[2], parts[1] - 1, parts[0]);
+            console.log("+parts[2]:",+parts[2],"+parts[1] - 1",+parts[1] - 1,"+parts[0]:",+parts[0],"parts[0]:",parts[0],"parts[1]:",parts[1],"parts[2]:",parts[2])
+            createperinput.dateNaiss = date;
+          }
+          else{
+            createperinput.dateNaiss = undefined;
+          }
+          createperinput.etatCivil= output.etatcivil;
           createperinput.adresse = output.address;
           createperinput.cvId = cv.id;
-          this.candidatService.createCandidat(createperinput);
+          this.personneService.createPersonne(createperinput);
           console.log("perinput:",createperinput);
           })
         console.log("cvinput:",createcvinput);
@@ -392,22 +551,10 @@ export class CvService {
     //return this.cvRepository.find({relations: ['certificats','candidatures','experiences','formations','langues','competences','activiteAssociatives','candidat']});
     const query = this.cvRepository.createQueryBuilder('cv');
     query
-      .leftJoinAndSelect('cv.langues', 'langues')
-      .leftJoinAndSelect('cv.formations', 'formations')
-      .leftJoinAndSelect('cv.experiences', 'experiences')
-      .leftJoinAndSelect('cv.competences', 'competences')
-      .leftJoinAndSelect('cv.certificats', 'certificats')
-      .leftJoinAndSelect('cv.activiteAssociatives', 'activiteAssociatives')
       .leftJoinAndSelect('cv.personne', 'personne')
       .leftJoinAndSelect('personne.candidatures', 'candidatures')
       .leftJoinAndSelect('candidatures.entretiens', 'entretiens');
     return query.getMany();
-  }
-
-  async findPostes(): Promise<Cv[]> {
-    const query = this.cvRepository.createQueryBuilder('cv');
-    query.select('posteAct').where('cv.posteAct <> ""').distinct(true);
-    return query.getRawMany();
   }
 
   async findOneCV(id: number): Promise<Cv> {
@@ -415,29 +562,16 @@ export class CvService {
     const query = this.cvRepository.createQueryBuilder('cv');
     query
       .where('cv.id= :id', { id })
-      .leftJoinAndSelect('cv.langues', 'langues')
-      .leftJoinAndSelect('cv.formations', 'formations')
-      .leftJoinAndSelect('cv.experiences', 'experiences')
-      .leftJoinAndSelect('cv.competences', 'competences')
-      .leftJoinAndSelect('cv.certificats', 'certificats')
-      .leftJoinAndSelect('cv.activiteAssociatives', 'activiteAssociatives')
       .leftJoinAndSelect('cv.personne', 'personne')
       .leftJoinAndSelect('personne.candidatures', 'candidatures')
       .leftJoinAndSelect('candidatures.entretiens', 'entretiens');
     return query.getOne();
   }
 
-  async findCvCandidat(idPer: number): Promise<Cv> {
+  async findCvPersonne(idPer: number): Promise<Cv> {
     const query = this.cvRepository.createQueryBuilder('cv');
     query
       .where('personne.id = :idPer', { idPer })
-      .leftJoinAndSelect('cv.langues', 'langues')
-      .leftJoinAndSelect('cv.personne', 'personne')
-      .leftJoinAndSelect('cv.formations', 'formations')
-      .leftJoinAndSelect('cv.experiences', 'experiences')
-      .leftJoinAndSelect('cv.competences', 'competences')
-      .leftJoinAndSelect('cv.certificats', 'certificats')
-      .leftJoinAndSelect('cv.activiteAssociatives', 'activiteAssociatives')
       .leftJoinAndSelect('personne.candidatures', 'candidatures')
       .leftJoinAndSelect('candidatures.entretiens', 'entretiens');
     return query.getOne();
@@ -471,200 +605,5 @@ export class CvService {
       supp = true;
     }
     return await supp;
-  }
-
-  /***************Certificat*********/
-  async findAllCertificats(): Promise<Certificat[]> {
-    return this.certificatRepository.find({
-      relations: ['cvs', 'cvs.personne'],
-    });
-  }
-
-  async findOneCertificat(idCertif: number): Promise<Certificat> {
-    return this.certificatRepository.findOneOrFail(idCertif, {
-      relations: ['cvs', 'cvs.personne'],
-    });
-  }
-
-  async updateCertif(
-    id: number,
-    updateCertifInput: UpdateCertifInput,
-  ): Promise<Certificat> {
-    //on recupere le personne d'id id et on replace les anciennes valeurs par celles du personne passées en parametres
-    const newCertif = await this.certificatRepository.preload({
-      id,
-      ...updateCertifInput,
-    });
-    //et la on va sauvegarder la nv entité
-    if (!newCertif) {
-      //si l id n existe pas
-      throw new NotFoundException(`certificat d'id ${id} n'exsite pas!`);
-    }
-    return await this.certificatRepository.save(newCertif);
-  }
-
-  /***************Competence*********/
-  async findAllCompetences(): Promise<Competence[]> {
-    const query = this.competenceRepository.createQueryBuilder('competence');
-    query.select('nom').distinct(true);
-    return query.getRawMany();
-  }
-
-  async findOneCompetence(idComp: number): Promise<Competence> {
-    return this.competenceRepository.findOneOrFail(idComp, {
-      relations: ['cvs', 'cvs.personne'],
-    });
-  }
-
-  async updateCompetence(
-    id: number,
-    updateCompetenceInput: UpdateCompetenceInput,
-  ): Promise<Competence> {
-    //on recupere le personne d'id id et on replace les anciennes valeurs par celles du personne passées en parametres
-    const newCompetence = await this.competenceRepository.preload({
-      id,
-      ...updateCompetenceInput,
-    });
-    //et la on va sauvegarder la nv entité
-    if (!newCompetence) {
-      //si l id n existe pas
-      throw new NotFoundException(`Competence d'id ${id} n'exsite pas!`);
-    }
-    return await this.competenceRepository.save(newCompetence);
-  }
-
-  /***************Experience*********/
-  async findAllExperiences(): Promise<Experience[]> {
-    return this.experienceRepository.find({
-      relations: ['cvs', 'cvs.personne'],
-    });
-  }
-
-  async findOneExperience(idExp: number): Promise<Experience> {
-    return this.experienceRepository.findOneOrFail(idExp, {
-      relations: ['cvs', 'cvs.personne'],
-    });
-  }
-
-  async updateExperience(
-    id: number,
-    updateExperienceInput: UpdateExperienceInput,
-  ): Promise<Experience> {
-    //on recupere le personne d'id id et on replace les anciennes valeurs par celles du personne passées en parametres
-    const newExperience = await this.experienceRepository.preload({
-      id,
-      ...updateExperienceInput,
-    });
-    //et la on va sauvegarder la nv entité
-    if (!newExperience) {
-      //si l id n existe pas
-      throw new NotFoundException(`experience d'id ${id} n'exsite pas!`);
-    }
-    return await this.experienceRepository.save(newExperience);
-  }
-  /***************Formation*********/
-  async findUniverFormations(): Promise<Formation[]> {
-    const query = this.formationRepository.createQueryBuilder('formation');
-    query
-      .select('universite')
-      .where("formation.universite NOT LIKE 'Lycée%'")
-      .distinct(true);
-    return query.getRawMany();
-  }
-
-  async findSpecFormations(): Promise<Formation[]> {
-    const query = this.formationRepository.createQueryBuilder('formation');
-    query.select('specialite').distinct(true);
-    return query.getRawMany();
-  }
-
-  async findNivFormations(): Promise<Formation[]> {
-    const query = this.formationRepository.createQueryBuilder('formation');
-    query
-      .select('niveau')
-      .where("formation.universite NOT LIKE 'Baccalauréat%'")
-      .distinct(true);
-    return query.getRawMany();
-  }
-
-  async findOneFormation(idForm: number): Promise<Formation> {
-    return this.formationRepository.findOneOrFail(idForm, {
-      relations: ['cvs', 'cvs.personne'],
-    });
-  }
-
-  async updateFormation(
-    id: number,
-    updateFormationInput: UpdateFormationInput,
-  ): Promise<Formation> {
-    //on recupere le personne d'id id et on replace les anciennes valeurs par celles du personne passées en parametres
-    const newFormation = await this.formationRepository.preload({
-      id,
-      ...updateFormationInput,
-    });
-    //et la on va sauvegarder la nv entité
-    if (!newFormation) {
-      //si l id n existe pas
-      throw new NotFoundException(`Formation d'id ${id} n'exsite pas!`);
-    }
-    return await this.formationRepository.save(newFormation);
-  }
-
-  /***************Langue*********/
-  async findAllLangues(): Promise<Langue[]> {
-    const query = this.langueRepository.createQueryBuilder('langue');
-    query.select('nom').distinct(true);
-    return query.getRawMany();
-  }
-
-  async findOneLangue(idLang: number): Promise<Langue> {
-    return this.langueRepository.findOneOrFail(idLang, {
-      relations: ['cvs', 'cvs.personne'],
-    });
-  }
-
-  async updateLangue(
-    id: number,
-    updateLangueInput: UpdateLangueInput,
-  ): Promise<Langue> {
-    //on recupere le personne d'id id et on replace les anciennes valeurs par celles du personne passées en parametres
-    const newLangue = await this.langueRepository.preload({
-      id,
-      ...updateLangueInput,
-    });
-    //et la on va sauvegarder la nv entité
-    if (!newLangue) {
-      //si l id n existe pas
-      throw new NotFoundException(`Langue d'id ${id} n'exsite pas!`);
-    }
-    return await this.langueRepository.save(newLangue);
-  }
-
-  /***************Activite associative*********/
-  async findAllActs(): Promise<ActiviteAssociative[]> {
-    return this.actRepository.find({ relations: ['cvs', 'cvs.personne'] });
-  }
-
-  async findOneAct(idAct: number): Promise<ActiviteAssociative> {
-    return this.actRepository.findOneOrFail(idAct, {
-      relations: ['cvs', 'cvs.personne'],
-    });
-  }
-
-  async updateAct(
-    id: number,
-    updateActAssocInput: UpdateActAssocInput,
-  ): Promise<ActiviteAssociative> {
-    //on recupere le personne d'id id et on replace les anciennes valeurs par celles du personne passées en parametres
-    const newAct = await this.actRepository.preload({
-      id,
-      ...updateActAssocInput,
-    });
-    //et la on va sauvegarder la nv entité
-    if (!newAct) {
-      //si l id n existe pas
-      throw new NotFoundException(`act associative d'id ${id} n'exsite pas!`);
-    }
-    return await this.actRepository.save(newAct);
   }
 }

@@ -1,13 +1,8 @@
-import { Langue } from './langue.entity';
-import { Formation } from './formation.entity';
-import { Experience } from './experience.entity';
-import { Competence } from './competence.entity';
-import { ActiviteAssociative} from './activite.associative.entity';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { StatutCV } from 'src/enum/StatutCV';
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Certificat } from './certificat.entity';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Personne } from '../../candidat/entities/personne.entity';
+import { IsString } from 'class-validator';
 
 @Entity('cv')
 @ObjectType()
@@ -19,18 +14,6 @@ export class Cv {
     @Column()
     @Field({nullable:true})
     cmptLinkedin?:string;
-    
-    @Column()
-    @Field({nullable:true})
-    cmptGithub?:string;
-
-    @Column()
-    @Field({nullable:true})
-    posteAct?:string;//poste actuelle si elle existe
-
-    @Column()
-    @Field({nullable:true})
-    description?:string;
 
     @Column({
         type: "enum",
@@ -40,46 +23,48 @@ export class Cv {
     @Field(type => StatutCV)
     statutCV: StatutCV;
 
-    @ManyToMany(()=>ActiviteAssociative, activiteAssociative=>activiteAssociative.cvs)
-    @JoinTable()
-    @Field(type=>[ActiviteAssociative],{nullable:true})
-    activiteAssociatives?: ActiviteAssociative[];
+    @Column("varchar", {length: 2500})
+    @IsString()
+    @Field({nullable:true})
+    activiteAssociatives?: string;
 
-    @ManyToMany(()=>Certificat, certificat=>certificat.cvs)
-    @JoinTable()
-    @Field(type=>[Certificat],{nullable:true})
-    certificats?: Certificat[];
+    @Column("varchar", {length: 2500})
+    @IsString()
+    @Field({nullable:true})
+    certificats?: string;
 
-    @ManyToMany(()=>Competence,competence=>competence.cvs)
-    @JoinTable()
-    @Field(type=>[Competence],{nullable:true})
-    competences?:Competence[];
+    @Column("simple-array")
+    // @IsString()
+    @Field(type => [String])
+    competences:string[];
+    
+    @Column("simple-array")
+    // @IsString()
+    @Field(type => [String])
+    langues: string[];
 
-    @ManyToMany(()=>Experience, experience=>experience.cvs)
-    @JoinTable()
-    @Field(type=>[Experience],{nullable:true})
-    experiences?: Experience[];
+    @Column("varchar", {length: 2500})
+    @IsString()
+    @Field({nullable:true})
+    experiences?: string;
 
-    @ManyToMany(()=>Formation, Formation=>Formation.cvs)
-    @JoinTable()
-    @Field(type=>[Formation],{nullable:true})
-    formations?: Formation[];
+    @Column("varchar", {length: 2500})
+    @IsString()
+    @Field({nullable:true})
+    formations?: string;
 
-    @ManyToMany(()=>Langue, langue=>langue.cvs)
-    @JoinTable()
-    @Field(type=>[Langue],{nullable:true})
-    langues?: Langue[];
+    @Column("varchar", {length: 2500})
+    @IsString()
+    @Field({nullable:true})
+    projets?: string;
 
+    @Column("varchar", {length: 2500})
+    @IsString()
+    @Field({nullable:true})
+    interets?: string;
     
     @OneToOne(type=>Personne, personne => personne.cv, {onDelete: "CASCADE" , onUpdate: "CASCADE"})
     @Field(type => Personne)
     personne :Personne;
     
-    // @OneToOne(type=>Candidat, candidat => candidat.cv, {onDelete: "CASCADE" })
-    // @Field(type => Candidat)
-    // candidat :Candidat;
-
-    // @OneToOne(type=>Collaborateur, col => col.cv, {onDelete: "CASCADE" })
-    // @Field(type => Collaborateur)
-    // collaborateur :Collaborateur;
 }

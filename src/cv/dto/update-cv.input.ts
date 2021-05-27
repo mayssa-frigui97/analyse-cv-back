@@ -10,26 +10,48 @@ export class UpdateCvInput extends PartialType(CreateCvInput) {
     @Field({nullable:true})
     cmptLinkedin?:string;
 
-    @IsString()
-    @IsOptional()
-    @Field({nullable:true})
-    cmptGithub?:string;
-
-    @IsString()
-    @IsOptional()
-    @Field({nullable:true})
-    posteAct?:string;
-
-    @IsString()
-    @IsOptional()
-    @Field({nullable:true})
-    description?:string;
-
     @IsOptional()
     @Field({nullable:true})
     statutCV: StatutCV;
 
-    // @IsOptional()
-    // @Field(type => UpdatePersonneInput,{nullable:true})
-    // personne? :UpdatePersonneInput;
+    @IsOptional()
+    @IsString()
+    @Field({nullable:true})
+    activiteAssociatives?: string;
+
+    @IsOptional()
+    @IsString()
+    @Field({nullable:true})
+    certificats?: string;
+    
+    @IsOptional()
+    @IsString()
+    @Field({nullable:true})
+    experiences?: string;
+    
+    @IsOptional()
+    @IsString()
+    @Field({nullable:true})
+    formations?: string;
+    
+    @IsOptional()
+    @IsString()
+    @Field({nullable:true})
+    projets?: string;
+    
+    @IsOptional()
+    @IsString()
+    @Field({nullable:true})
+    interets?: string;
+
+    @IsOptional()
+    @IsString()
+    @Field(type => [String],{nullable:true})
+    competences?:string[];
+
+    @IsOptional()
+    @IsString()
+    @Field(type => [String],{nullable:true})
+    langues?: string[];
+
 }

@@ -6,6 +6,7 @@ import { BeforeInsert, ChildEntity, Column, Entity, Index, JoinColumn, ManyToOne
 import { IsEmail, IsOptional, MaxLength, MinLength } from 'class-validator';
 import { Personne } from '../../candidat/entities/personne.entity';
 import * as bcrypt from 'bcrypt';
+import { UserPermission } from 'src/enum/UserPermission';
 
 // @ChildEntity('collaborateur')
 @Entity('collaborateur')
@@ -15,10 +16,10 @@ export class Collaborateur extends Personne{
     // @PrimaryGeneratedColumn()
     // @Field(type => Int)
     // id:number;
-    // @Index({ unique: true })
-    // @Column()
-    // @Field(type => Int)
-    // cin: number;
+    @Index({ unique: true })
+    @Column()
+    @Field(type => Int)
+    cin: number;
 
     @Column()
     @Field(type => Int)
@@ -66,6 +67,7 @@ export class Collaborateur extends Personne{
     })
     @HideField()
     motDePasse: string;
+    static Cv: any;
 
     @BeforeInsert()
     async hashPassword?(){
@@ -79,6 +81,14 @@ export class Collaborateur extends Personne{
     })
     @Field(type => UserRole)
     role :UserRole;
+
+    @Column({
+        type: "enum",
+        enum: UserPermission,
+        default: UserPermission.VISITEUR
+    })
+    @Field(type => UserPermission)
+    permission :UserPermission;
 
     @Column()
     @Field(type => Int,{nullable:true})
