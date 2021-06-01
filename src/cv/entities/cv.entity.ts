@@ -1,8 +1,9 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { StatutCV } from 'src/enum/StatutCV';
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Personne } from '../../candidat/entities/personne.entity';
 import { IsString } from 'class-validator';
+import { Competence } from './competence.entity';
 
 @Entity('cv')
 @ObjectType()
@@ -67,4 +68,18 @@ export class Cv {
     @Field(type => Personne)
     personne :Personne;
     
+    @ManyToMany(()=>Competence,competence=>competence.cvs, {cascade: true})
+    @JoinTable({
+        // name: 'cv-competence',
+        // joinColumn: {
+        //   name: 'cvId',
+        //   referencedColumnName: 'id',
+        // },
+        // inverseJoinColumn: {
+        //   name: 'competenceId',
+        //   referencedColumnName: 'id',
+        //   },
+      })
+    @Field(type=>[Competence],{nullable:true})
+    skills?:Competence[];
 }

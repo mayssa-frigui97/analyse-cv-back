@@ -62,7 +62,8 @@ export class CollaborateurService {
         .leftJoinAndSelect('equipe.teamleader', 'teamleader')
         .leftJoinAndSelect('collaborateur.candidatures','candidatures')
         .leftJoinAndSelect('candidatures.entretiens','entretiens')
-        .leftJoinAndSelect('collaborateur.cv','cv');
+        .leftJoinAndSelect('collaborateur.cv','cv')
+        .leftJoinAndSelect('cv.skills','skills');
         return query.getOne();
     }
 
@@ -70,7 +71,7 @@ export class CollaborateurService {
         return jwt.sign({ id, nomUtilisateur }, 'secret');
       }
 
-    async findAllCols(poleId):Promise<Collaborateur[]>{
+    async findAllCols(poleId?):Promise<Collaborateur[]>{
         const query = this.collaborateurRepository.createQueryBuilder('collaborateur');
         query
         .leftJoinAndSelect('collaborateur.notifications','notifications')
@@ -81,6 +82,7 @@ export class CollaborateurService {
         .leftJoinAndSelect('collaborateur.candidatures','candidatures')
         .leftJoinAndSelect('candidatures.entretiens','entretiens')
         .leftJoinAndSelect('collaborateur.cv','cv')
+        .leftJoinAndSelect('cv.skills','skills')
         .orderBy('collaborateur.nom');
         if(poleId) {
             query.where('pole.id = :poleId', {poleId})
@@ -98,7 +100,8 @@ export class CollaborateurService {
         .leftJoinAndSelect('equipe.teamleader', 'teamleader')
         .leftJoinAndSelect('collaborateur.candidatures','candidatures')
         .leftJoinAndSelect('candidatures.entretiens','entretiens')
-        .leftJoinAndSelect('collaborateur.cv','cv');
+        .leftJoinAndSelect('collaborateur.cv','cv')
+        .leftJoinAndSelect('cv.skills','skills');
         return query.getOne();
     }
 
@@ -137,21 +140,33 @@ export class CollaborateurService {
 
     async getFilterCols(selectedPoles?: number[],selectedEquipes?: number[],selectedPoste?: string[],selectedComp?: string[]):Promise<Collaborateur[]>{
         const query = this.collaborateurRepository.createQueryBuilder('collaborateur');
-        query
-          .where('pole.id in (:selectedPoles)', { selectedPoles })
-          .orWhere('equipe.id in (:selectedEquipes)', { selectedEquipes })
-          .orWhere('collaborateur.poste in (:selectedPoste)',{selectedPoste})
-        //   .orWhere('cv.competences in (:selectedComp)',{selectedComp})
-          .orWhere('find_in_set(:selectedComp,cv.competences)',{selectedComp})
-          .leftJoinAndSelect('collaborateur.equipe', 'equipe')
-          .leftJoinAndSelect('equipe.pole', 'pole')
-          .leftJoinAndSelect('pole.rp', 'rp')
-          .leftJoinAndSelect('equipe.teamleader', 'teamleader')
-          .leftJoinAndSelect('collaborateur.notifications', 'notifications')
-          .leftJoinAndSelect('collaborateur.candidatures', 'candidatures')
-          .leftJoinAndSelect('candidatures.entretiens', 'entretiens')
-          .leftJoinAndSelect('collaborateur.cv', 'cv')
-          .orderBy('collaborateur.nom');
+          console.log("*************")
+          if(selectedPoles){
+            console.log("pole true")
+            query.andWhere('pole.id in (:selectedPoles)', { selectedPoles })
+          }
+          if(selectedPoste){
+            console.log("poste true")
+            query.andWhere('collaborateur.poste in (:selectedPoste)',{selectedPoste})
+          }
+          if(selectedEquipes){
+            console.log("equipe true")
+            query.andWhere('equipe.id in (:selectedEquipes)', { selectedEquipes })
+          }
+          if(selectedComp){
+            console.log("comp true")
+            query.andWhere('skills.nom in (:selectedComp)',{selectedComp})
+          }
+        query.leftJoinAndSelect('collaborateur.equipe', 'equipe')
+        .leftJoinAndSelect('equipe.pole', 'pole')
+        .leftJoinAndSelect('pole.rp', 'rp')
+        .leftJoinAndSelect('equipe.teamleader', 'teamleader')
+        .leftJoinAndSelect('collaborateur.notifications', 'notifications')
+        .leftJoinAndSelect('collaborateur.candidatures', 'candidatures')
+        .leftJoinAndSelect('candidatures.entretiens', 'entretiens')
+        .leftJoinAndSelect('collaborateur.cv', 'cv')
+        .leftJoinAndSelect('cv.skills','skills')
+        .orderBy('collaborateur.nom');
         return query.getMany();
     }
 
@@ -179,6 +194,7 @@ export class CollaborateurService {
           .leftJoinAndSelect('equipe.teamleader', 'teamleader')
           .leftJoinAndSelect('collaborateur.notifications', 'notifications')
           .leftJoinAndSelect('collaborateur.cv', 'cv')
+          .leftJoinAndSelect('cv.skills','skills')
           .leftJoinAndSelect('collaborateur.candidatures', 'candidatures')
           .leftJoinAndSelect('candidatures.entretiens', 'entretiens');
         //   .orderBy('collaborateur.nom');
@@ -195,6 +211,7 @@ export class CollaborateurService {
           .leftJoinAndSelect('equipe.teamleader', 'teamleader')
           .leftJoinAndSelect('collaborateur.notifications', 'notifications')
           .leftJoinAndSelect('collaborateur.cv', 'cv')
+          .leftJoinAndSelect('cv.skills','skills')
           .leftJoinAndSelect('collaborateur.candidatures', 'candidatures')
           .leftJoinAndSelect('candidatures.entretiens', 'entretiens');
         return query.getMany();
@@ -205,6 +222,7 @@ export class CollaborateurService {
         query.where('rp.id= :idRP',{idRP})
         .leftJoinAndSelect('pole.rp','rp')
         .leftJoinAndSelect('rp.cv','cv')
+        .leftJoinAndSelect('cv.skills','skills')
         .leftJoinAndSelect('pole.equipes','equipes')
         .leftJoinAndSelect('equipes.collaborateurs','collaborateurs')
         return query.getOne();
@@ -217,6 +235,7 @@ export class CollaborateurService {
         query
         .leftJoinAndSelect('pole.rp','rp')
         .leftJoinAndSelect('rp.cv','cv')
+        .leftJoinAndSelect('cv.skills','skills')
         .leftJoinAndSelect('pole.equipes','equipes')
         .leftJoinAndSelect('equipes.collaborateurs','collaborateurs')
         .leftJoinAndSelect('equipes.teamleader','teamleader')
@@ -232,6 +251,7 @@ export class CollaborateurService {
         query.where('pole.id= :id',{id})
         .leftJoinAndSelect('pole.rp','rp')
         .leftJoinAndSelect('rp.cv','cv')
+        .leftJoinAndSelect('cv.skills','skills')
         .leftJoinAndSelect('pole.equipes','equipes')
         .leftJoinAndSelect('equipes.collaborateurs','collaborateurs')
         .leftJoinAndSelect('equipes.teamleader','teamleader')
@@ -257,6 +277,7 @@ export class CollaborateurService {
         .leftJoinAndSelect('collaborateurs.candidatures','candidatures')
         .leftJoinAndSelect('candidatures.entretiens','entretiens')
         .leftJoinAndSelect('teamleader.cv','cv')
+        .leftJoinAndSelect('cv.skills','skills')
         .orderBy('equipe.nom');
         return query.getMany();
     }
@@ -271,6 +292,7 @@ export class CollaborateurService {
         .leftJoinAndSelect('collaborateurs.candidatures','candidatures')
         .leftJoinAndSelect('candidatures.entretiens','entretiens')
         .leftJoinAndSelect('teamleader.cv','cv')
+        .leftJoinAndSelect('cv.skills','skills')
         return query.getOne();    }
 
         async findEquipesPoles(idPoles: number[]):Promise<Equipe[]>{

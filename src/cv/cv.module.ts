@@ -4,11 +4,12 @@ import { Module } from '@nestjs/common';
 import { CvService } from './cv.service';
 import { CvResolver } from './cv.resolver';
 import { PersonneModule } from 'src/candidat/personne.module';
+import { Competence } from './entities/competence.entity';
 
 @Module({
   imports: [
-  
-TypeOrmModule.forFeature([Cv]),
+
+TypeOrmModule.forFeature([Cv,Competence]),
   PersonneModule
 ],
   providers: [CvResolver, CvService],

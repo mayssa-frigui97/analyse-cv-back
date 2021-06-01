@@ -15,6 +15,13 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Competence {
+  id: Int!
+  nom: String!
+  version: Int
+  cvs: [Cv!]!
+}
+
 type Cv {
   id: Int!
   cmptLinkedin: String
@@ -28,6 +35,7 @@ type Cv {
   projets: String
   interets: String
   personne: Personne!
+  skills: [Competence!]
   CvPersonne: Cv!
 }
 
@@ -156,14 +164,16 @@ type Query {
   findCvs: [Cv!]!
   findCv(idCv: Int!): Cv!
   findCvPersonne(idPersonne: Int!): Cv!
+  findCompetences: [Cv!]!
   getCvsMail: Boolean!
   extractCv: Boolean!
   getTextPdf: Boolean!
   addCvs: Boolean!
-  getAvatar(email: String!): String!
+  findAllCompetences: [Competence!]!
+  findCompetence(idComp: Int!): Competence!
   findPersonnes: [Personne!]!
   findPersonne(idPersonne: Int!): Personne!
-  findFilterCands(selectedComp: [String!], selectedUniver: [String!], selectedSpec: [String!], selectedNiv: [String!]): [Personne!]!
+  findFilterCands(selectedComp: [String!]): [Personne!]!
   findCandidatures: [Candidature!]!
   findCandidature(idCandidature: Int!): Candidature!
   getUserAuth: Collaborateur!
@@ -183,6 +193,8 @@ type Mutation {
   createCv(createCvInput: CreateCvInput!): Cv!
   updateCv(updateCvInput: UpdateCvInput!, idCv: Int!): Cv!
   removeCv(idCv: Int!): Boolean!
+  createCompetence(createCompetenceInput: CreateCompetenceInput!): Competence!
+  updateCompetence(updateCompetenceInput: UpdateCompetenceInput!, idCompetence: Int!): Competence!
   updateRecommande(value: Boolean!, idPersonne: Int!): Boolean!
   createPersonne(createPersonneInput: CreatePersonneInput!): Personne!
   updatePersonne(updatePersonneInput: UpdatePersonneInput!, idPersonne: Int!): Personne!
@@ -251,6 +263,12 @@ input UpdateCvInput {
   interets: String
   competences: [String!]
   langues: [String!]
+  skills: [CreateCompetenceInput!]
+}
+
+input CreateCompetenceInput {
+  nom: String!
+  version: Int
 }
 
 input UpdateEquipeInput {
@@ -283,6 +301,12 @@ input CreateCvInput {
   interets: String
   competences: [String!]
   langues: [String!]
+  skills: [CreateCompetenceInput!]
+}
+
+input UpdateCompetenceInput {
+  nom: String
+  version: Int
 }
 
 input CreatePersonneInput {

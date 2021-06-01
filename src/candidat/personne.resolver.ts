@@ -58,12 +58,12 @@ export class PersonneResolver {
 
   @Query((returns) => [Personne])
   findFilterCands(
-    @Args('selectedNiv', { type: () => [String],nullable:true}) selectedNiv?: string[],
-    @Args('selectedSpec', { type: () => [String],nullable:true}) selectedSpec?: string[],
-    @Args('selectedUniver', { type: () => [String],nullable:true}) selectedUniver?: string[],
+    // @Args('selectedNiv', { type: () => [String],nullable:true}) selectedNiv?: string[],
+    // @Args('selectedSpec', { type: () => [String],nullable:true}) selectedSpec?: string[],
+    // @Args('selectedUniver', { type: () => [String],nullable:true}) selectedUniver?: string[],
     @Args('selectedComp', { type: () => [String],nullable:true}) selectedComp?: string[]
   ): Promise<Personne[]> {
-    return this.personneService.getFilterCand(selectedNiv,selectedSpec,selectedUniver,selectedComp);
+    return this.personneService.getFilterCand(selectedComp);
   }
 
   /**********Personneure**********/

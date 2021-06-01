@@ -4,6 +4,9 @@ import { Cv } from './entities/cv.entity';
 import { CreateCvInput } from './dto/create-cv.input';
 import { UpdateCvInput } from './dto/update-cv.input';
 import { Personne } from '../candidat/entities/personne.entity';
+import { Competence } from './entities/competence.entity';
+import { UpdateCompetenceInput } from './dto/update-competence.input';
+import { CreateCompetenceInput } from './dto/create-competence.input';
 
 @Resolver(() => Cv)
 export class CvResolver {
@@ -45,6 +48,11 @@ export class CvResolver {
     return supp;
   }
 
+  @Query(() => [Cv], { name: 'findCompetences' })
+  findCompetences() {
+    return this.cvService.findCompetences();
+  }
+
   @ResolveField(returns => Cv)
   async CvPersonne(@Parent() personne: Personne) {
     return this.cvService.findOneCV(personne.cvId);
@@ -72,8 +80,36 @@ export class CvResolver {
     return this.cvService.addCvs();
   }
   
-    @Query((returns) => String)
-    getAvatar(@Args('email') email: string):Promise<String> {
-      return this.cvService.getAvatar(email);
+  //   @Query((returns) => String)
+  //   getAvatar(@Args('email') email: string):Promise<String> {
+  //     return this.cvService.getAvatar(email);
+  // }
+
+  //******************competence********** */
+
+  @Mutation(() => Competence)
+  createCompetence(@Args('createCompetenceInput') createCompetenceInput: CreateCompetenceInput) {
+    return this.cvService.createCompetences(createCompetenceInput);
   }
+
+  @Query((returns) => [Competence])
+  findAllCompetences(): Promise<Competence[]> {
+    return this.cvService.findAllCompetences();
+  }
+
+  @Query((returns) => Competence)
+  findCompetence(
+    @Args('idComp', { type: () => Int }) idComp: number,
+  ): Promise<Competence> {
+    return this.cvService.findOneCompetence(idComp);
+  }
+
+  @Mutation(() => Competence)
+  updateCompetence(
+    @Args('idCompetence', { type: () => Int }) idCompetence: number,
+    @Args('updateCompetenceInput') updateCompetenceInput: UpdateCompetenceInput,
+  ) {
+    return this.cvService.updateCompetence(idCompetence, updateCompetenceInput);
+  }
+
 }

@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { InputType, Int, Field } from '@nestjs/graphql';
 import { StatutCV } from 'src/enum/StatutCV';
+import { CreateCompetenceInput } from './create-competence.input';
 
 @InputType()
 export class CreateCvInput {
@@ -51,4 +52,8 @@ export class CreateCvInput {
     @IsOptional()
     @Field(type => [String],{nullable:true})
     langues?: string[];
+
+    @IsOptional()
+    @Field(type => [CreateCompetenceInput],{nullable:true})
+    skills? :CreateCompetenceInput[];
 }

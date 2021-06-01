@@ -9,6 +9,9 @@ import { readFile, writeFile , readdir} from 'fs';
 import { StatutCV } from 'src/enum/StatutCV';
 import { PersonneService } from 'src/candidat/personne.service';
 import { CreatePersonneInput } from 'src/candidat/dto/create-personne.input';
+import { Competence } from './entities/competence.entity';
+import { UpdateCompetenceInput } from './dto/update-competence.input';
+import { CreateCompetenceInput } from './dto/create-competence.input';
 
 
 // var Imap = require('imap'),
@@ -120,22 +123,24 @@ export class CvService {
   constructor(
     @InjectRepository(Cv)
     private cvRepository: Repository<Cv>,
-    private personneService : PersonneService
+    private personneService : PersonneService,
+    @InjectRepository(Competence)
+    private competenceRepository: Repository<Competence>
   ) {}
 
   /***************Cv*********/
 
-  async getAvatar(email: string):Promise<String>{
+  async getAvatar(email: string){
 
-      const size = 200;
-      const defaults = 'retro';
+      // const size = 200;
+      // const defaults = 'retro';
     
-      if (!email) {
-        return 'https://gravatar.com/avatar/?s=' + size + '&d=' + defaults;
-      }
+      // if (!email) {
+      //   return 'https://gravatar.com/avatar/?s=' + size + '&d=' + defaults;
+      // }
     
-      var md5 = crypto.createHash('md5').update(email);
-      return 'https://gravatar.com/avatar/' + md5.digest('hex').toString() + '?s=' + size + '&d=' + defaults;
+      // var md5 = crypto.createHash('md5').update(email);
+      // return 'https://gravatar.com/avatar/' + md5.digest('hex').toString() + '?s=' + size + '&d=' + defaults;
 
     // var result: string[];
     // var url = gravatar.url(email, {s: '200', r: 'pg', d: '404'});
@@ -147,6 +152,13 @@ export class CvService {
     // result=url+unsecureUrl+Url+httpUrl+httpsUrl+profile2;
     // console.log("result:",result,"url:",url)
     // return url;
+    // let directory_input = 'files/compiledFiles/';
+    // let directory_output = 'files/imgs/';
+    // server.get('https://pdfcandy.com/fr/result/18c506e020ec6dab.html', function(request, response) {
+    //   var p1 = request.param(directory_input  + 'cv.pdf'); 
+    //   console.log(p1);
+    //   response.sendFile( directory_output  + 'cv.pdf');
+    // });
   }
   async addCvs():Promise<boolean>{
     let directory_name = 'files/compiledFiles/';
@@ -165,7 +177,7 @@ export class CvService {
         createcvinput.certificats=output.certification;
         createcvinput.interets=output.interests;
         createcvinput.projets=output.projects;
-        var skills0 = output.skills.split("\n(").join("(");
+        var skills0 = output.skills.split("(ubuntu)").join("");
         var skills1 = skills0.split(".\n").join(",");
         var skills2 = skills1.split(",\n").join(",");//replaceAll("\n",",")
         var skills3 = skills2.split("\n,").join(",");
@@ -235,6 +247,13 @@ export class CvService {
         }
         output.skills=C;
         var competences = output.skills.split(" et ").join(",");
+        var competence = competences.split(",");
+        var compts = [];
+        competence.forEach(comp => {
+            compts.push({nom:comp});
+          });
+        console.log("compts:",compts);
+        createcvinput.skills=compts;
         createcvinput.competences=competences;
         var langues = output.languages.split("\n").join(",");
         var langue = langues.split(" ▪ ").join("");
@@ -322,7 +341,9 @@ export class CvService {
             createperinput.dateNaiss = date;
           }
           else{
-            createperinput.dateNaiss = undefined;
+            var date = new Date("1899-11-29T23:46:24.000Z");
+            createperinput.dateNaiss = date;
+            console.log("date:",date)
           }
           createperinput.etatCivil= output.etatcivil;
           createperinput.adresse = output.address;
@@ -547,11 +568,13 @@ export class CvService {
     return await true;
   }
 
+  // ************cv*********************************************************************************************
+
   async findAllCVs(): Promise<Cv[]> {
-    //return this.cvRepository.find({relations: ['certificats','candidatures','experiences','formations','langues','competences','activiteAssociatives','candidat']});
     const query = this.cvRepository.createQueryBuilder('cv');
     query
       .leftJoinAndSelect('cv.personne', 'personne')
+      .leftJoinAndSelect('cv.skills', 'skills')
       .leftJoinAndSelect('personne.candidatures', 'candidatures')
       .leftJoinAndSelect('candidatures.entretiens', 'entretiens');
     return query.getMany();
@@ -563,6 +586,7 @@ export class CvService {
     query
       .where('cv.id= :id', { id })
       .leftJoinAndSelect('cv.personne', 'personne')
+      .leftJoinAndSelect('cv.skills', 'skills')
       .leftJoinAndSelect('personne.candidatures', 'candidatures')
       .leftJoinAndSelect('candidatures.entretiens', 'entretiens');
     return query.getOne();
@@ -572,6 +596,7 @@ export class CvService {
     const query = this.cvRepository.createQueryBuilder('cv');
     query
       .where('personne.id = :idPer', { idPer })
+      .leftJoinAndSelect('cv.skills', 'skills')
       .leftJoinAndSelect('personne.candidatures', 'candidatures')
       .leftJoinAndSelect('candidatures.entretiens', 'entretiens');
     return query.getOne();
@@ -606,4 +631,48 @@ export class CvService {
     }
     return await supp;
   }
+
+  async findCompetences(): Promise<Cv[]> {
+    const query = this.cvRepository.createQueryBuilder('cv');
+    query.select('competences');//.distinct(true)
+    return query.getRawOne();
+  }
+
+  //***********competence************ */
+  async findAllCompetences(): Promise<Competence[]> {
+    const query = this.competenceRepository.createQueryBuilder('competence');
+    query.select('nom').distinct(true).orderBy("competence.nom")
+    // .leftJoinAndSelect('competence.cvs', 'cvs')
+    // .leftJoinAndSelect('cvs.personne', 'personne');
+    return query.getRawMany();
+  }
+
+  async findOneCompetence(idComp: number): Promise<Competence> {
+    return this.competenceRepository.findOneOrFail(idComp, {
+      relations: ['cvs', 'cvs.personne'],
+    });
+  }
+
+  async createCompetences(createCompetenceInput: CreateCompetenceInput): Promise<Competence> {
+    const newComp = this.competenceRepository.create(createCompetenceInput);
+    return this.competenceRepository.save(newComp);
+  }
+
+  async updateCompetence(
+    id: number,
+    updateCompetenceInput: UpdateCompetenceInput,
+  ): Promise<Competence> {
+    //on recupere le personne d'id id et on replace les anciennes valeurs par celles du personne passées en parametres
+    const newCompetence = await this.competenceRepository.preload({
+      id,
+      ...updateCompetenceInput,
+    });
+    //et la on va sauvegarder la nv entité
+    if (!newCompetence) {
+      //si l id n existe pas
+      throw new NotFoundException(`Competence d'id ${id} n'exsite pas!`);
+    }
+    return await this.competenceRepository.save(newCompetence);
+  }
+
 }

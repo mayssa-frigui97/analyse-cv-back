@@ -37,6 +37,7 @@ export class PersonneService {
   async findAllPersonnes(): Promise<Personne[]> {
     const query = this.personneRepository.createQueryBuilder('personne');
         query.leftJoinAndSelect('personne.cv','cv')
+        .leftJoinAndSelect('cv.skills','skills')
         .leftJoinAndSelect('personne.candidatures','candidatures')
         .leftJoinAndSelect('candidatures.entretiens','entretiens')
         .orderBy('personne.nom');
@@ -50,6 +51,7 @@ export class PersonneService {
     const query = this.personneRepository.createQueryBuilder('personne');
         query.where('personne.id= :idPer',{idPer})
         .leftJoinAndSelect('personne.cv','cv')
+        .leftJoinAndSelect('cv.skills','skills')
         .leftJoinAndSelect('personne.candidatures','candidatures')
         .leftJoinAndSelect('candidatures.entretiens','entretiens')
     return query.getOne();
@@ -103,16 +105,18 @@ export class PersonneService {
     return this.personneRepository.restore(idCand);
   }
 
-  async getFilterCand(selectedNiv?: string[], selectedSpec?: string[],selectedUniver?: string[],selectedComp?: string[]):Promise<Personne[]>{
+  async getFilterCand(selectedComp?: string[]):Promise<Personne[]>{
     const query = this.personneRepository.createQueryBuilder('Personne');
-    query
-      .orWhere('formations.universite in (:selectedUniver)', { selectedUniver })
-      .orWhere('formations.niveau in (:selectedNiv)', { selectedNiv })
-      .orWhere('formations.specialite in (:selectedSpec)',{selectedSpec})
-      .orWhere('competences.nom in (:selectedComp)',{selectedComp})
-      .leftJoinAndSelect('Personne.candidatures', 'candidatures')
+      // .orWhere('formations.universite in (:selectedUniver)', { selectedUniver })
+      // .orWhere('formations.niveau in (:selectedNiv)', { selectedNiv })
+      // .orWhere('formations.specialite in (:selectedSpec)',{selectedSpec})
+      if(selectedComp){
+        query.andWhere('skills.nom in (:selectedComp)',{selectedComp})
+      }
+      query.leftJoinAndSelect('Personne.candidatures', 'candidatures')
       .leftJoinAndSelect('candidatures.entretiens', 'entretiens')
       .leftJoinAndSelect('Personne.cv', 'cv')
+      .leftJoinAndSelect('cv.skills','skills')
       .orderBy('personne.nom');
     return query.getMany();
 }
@@ -122,7 +126,8 @@ export class PersonneService {
     const query = this.candidatureRepository.createQueryBuilder('candidature');
         query.leftJoinAndSelect('candidature.entretiens','entretiens')
         .leftJoinAndSelect('candidature.personne','personne')
-        .leftJoinAndSelect('personne.cv','cv');
+        .leftJoinAndSelect('personne.cv','cv')
+        .leftJoinAndSelect('cv.skills','skills');
     return query.getMany();
   }
 
@@ -131,7 +136,8 @@ export class PersonneService {
         query.where('candidature.id= :idcandidature',{idcandidature})
         .leftJoinAndSelect('candidature.entretiens','entretiens')
         .leftJoinAndSelect('candidature.personne','personne')
-        .leftJoinAndSelect('personne.cv','cv');
+        .leftJoinAndSelect('personne.cv','cv')
+        .leftJoinAndSelect('cv.skills','skills');
     return query.getOne();
   }
 }
