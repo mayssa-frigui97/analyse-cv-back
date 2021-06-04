@@ -34,10 +34,10 @@ export class Cv {
     @Field({nullable:true})
     certificats?: string;
 
-    @Column("simple-array")
-    // @IsString()
-    @Field(type => [String])
-    competences:string[];
+    // @Column("simple-array")
+    // // @IsString()
+    // @Field(type => [String])
+    // competences:string[];
     
     @Column("simple-array")
     // @IsString()
@@ -81,5 +81,5 @@ export class Cv {
         //   },
       })
     @Field(type=>[Competence],{nullable:true})
-    skills?:Competence[];
+    competences?:Competence[];
 }

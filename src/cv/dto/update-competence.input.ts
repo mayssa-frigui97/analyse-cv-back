@@ -10,8 +10,8 @@ export class UpdateCompetenceInput{
     @Field({nullable:true})
     nom?: string;
 
-    @IsInt()
-    @IsOptional()
-    @Field(type => Int,{nullable:true})
-    version?:number;
+    // @IsInt()
+    // @IsOptional()
+    // @Field(type => Int,{nullable:true})
+    // version?:number;
 }

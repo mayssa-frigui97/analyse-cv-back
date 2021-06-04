@@ -16,10 +16,10 @@ export class Competence {
     @Field()
     nom:string;
 
-    @IsNumber()
-    @Column()
-    @Field(type => Int,{nullable:true})
-    version?:number;
+    // @IsNumber()
+    // @Column()
+    // @Field(type => Int,{nullable:true})
+    // version?:number;
 
     @ManyToMany(()=>Cv, cv=>cv.competences)
     @Field(type => [Cv])

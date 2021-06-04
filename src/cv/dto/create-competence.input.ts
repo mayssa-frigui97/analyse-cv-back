@@ -9,9 +9,9 @@ export class CreateCompetenceInput{
     @Field()
     nom: string;
 
-    @IsInt()
-    @IsOptional()
-    @Field(type => Int,{nullable:true})
-    version?:number;
+    // @IsInt()
+    // @IsOptional()
+    // @Field(type => Int,{nullable:true})
+    // version?:number;
 
 }

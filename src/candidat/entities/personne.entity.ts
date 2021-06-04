@@ -56,7 +56,7 @@ export class Personne {
     @OneToOne(type => Cv, cv => cv.personne, {cascade: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
     @JoinColumn()
     @Field(type => Cv)
-    public cv?: Cv;
+    public cv: Cv;
 
     @Index({ unique: true })
     @Column()

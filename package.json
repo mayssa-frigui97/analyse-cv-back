@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "^7.13.0",
     "@nestjs-modules/mailer": "^1.6.0",
     "@nestjs/common": "^7.6.13",
     "@nestjs/core": "^7.6.13",
@@ -41,11 +42,13 @@
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "cv-parser": "0.0.1",
+    "elasticsearch": "^16.7.2",
     "fs": "0.0.1-security",
     "fs-extra": "^10.0.0",
     "gm": "^1.23.1",
     "graphql": "^15.5.0",
     "graphql-tools": "^7.0.4",
+    "graphql-upload": "^11.0.0",
     "gravatar": "^1.8.1",
     "imap": "^0.8.19",
     "js-base64": "^3.6.0",

@@ -10,13 +10,30 @@ export class PersonneResolver {
   constructor(
     private readonly personneService: PersonneService) {}
 
-  /**********Personne***********/
-  // @Mutation(() => [Personne])
-  // updateRecommande(@Args('idPersonne',{ type: () => Int }) idPersonne: number,
-  // @Args('value',{ type: () => Boolean }) value: boolean) {
-  //   return this.personneService.changeRecommande(idPersonne,value);
+
+  /*************Requests ElasticSearch********** */
+
+  @Query((returns) => Boolean)
+  createIndex():Promise<boolean> {
+    return this.personneService.createIndex();
+  }
+
+  @Query((returns) => Boolean)//fonctionnelle
+  createData():Promise<boolean> {
+    return this.personneService.createData();
+  }
+
+  // @Query((returns) => [Personne])
+  // searchFormation(@Args('formation') formation: string):Promise<Personne[]> {
+  //   return this.personneService.searchFormation(formation);
   // }
 
+  @Query((returns) => [Personne])
+  search(@Args('mot') mot: string):Promise<Personne[]> {
+    return this.personneService.search(mot);
+  }
+
+  /**********Personne***********/
   @Mutation(() => Boolean)
   updateRecommande(@Args('idPersonne',{ type: () => Int }) idPersonne: number,
   @Args('value',{ type: () => Boolean }) value: boolean) {
@@ -38,6 +55,13 @@ export class PersonneResolver {
     return this.personneService.findOnePersonne(id);
   }
 
+  @Query(() => [Personne], { name: 'findPersonnesId' })
+  findPersonneIds(
+    @Args('ids1', { type: () => [Int],nullable:true })  ids1?: number[],
+    @Args('ids2', { type: () => [Int],nullable:true }) ids2?: number[]) {
+    return this.personneService.findPersonnesId(ids1,ids2);
+  }
+
   @Mutation(() => Personne)
   updatePersonne(
     @Args('idPersonne', { type: () => Int }) id: number,
@@ -48,6 +72,12 @@ export class PersonneResolver {
   @Mutation(() => Boolean)
   removePersonne(@Args('idPersonne', { type: () => Int }) id: number) {
     var supp=this.personneService.removePersonne(id);
+    return supp;
+  }
+
+  @Mutation(() => Boolean)
+  removeCandidat(@Args('idCand', { type: () => Int }) idCand: number) {
+    var supp=this.personneService.removeCand(idCand);
     return supp;
   }
 

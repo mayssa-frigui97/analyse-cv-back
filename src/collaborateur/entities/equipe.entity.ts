@@ -25,6 +25,6 @@ export class Equipe {
     @OneToOne(()=>Collaborateur)
     @JoinColumn()
     @Field(type => Collaborateur)
-    teamleader :Collaborateur;//lazem role mte3ou teamleader
+    teamleader :Collaborateur;
 
 }

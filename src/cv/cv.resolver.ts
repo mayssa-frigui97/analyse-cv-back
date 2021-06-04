@@ -7,6 +7,8 @@ import { Personne } from '../candidat/entities/personne.entity';
 import { Competence } from './entities/competence.entity';
 import { UpdateCompetenceInput } from './dto/update-competence.input';
 import { CreateCompetenceInput } from './dto/create-competence.input';
+import { createReadStream, createWriteStream } from 'fs';
+import { GraphQLUpload, FileUpload } from 'graphql-upload';
 
 @Resolver(() => Cv)
 export class CvResolver {
@@ -71,6 +73,11 @@ export class CvResolver {
   }
   
   @Query((returns) => Boolean)
+  extractOneCv(@Args('file') file: string):Promise<boolean> {
+    return this.cvService.extractOneCv(file);
+  }
+  
+  @Query((returns) => Boolean)
   getTextPdf():Promise<boolean> {
     return this.cvService.getTextPdf();
   }
@@ -79,7 +86,21 @@ export class CvResolver {
   addCvs():Promise<boolean> {
     return this.cvService.addCvs();
   }
-  
+
+  @Mutation(() => Boolean)
+  async uploadSigleFile(
+    @Args({ type: () => GraphQLUpload, name: 'upload', nullable: true })
+    upload: FileUpload,
+  ) {
+    console.log(upload.filename, upload.mimetype);
+    return true;
+  }
+
+  // @Query((returns) => Boolean)
+  // bdToJson():Promise<boolean> {
+  //   return this.cvService.bdToJson();
+  // }
+
   //   @Query((returns) => String)
   //   getAvatar(@Args('email') email: string):Promise<String> {
   //     return this.cvService.getAvatar(email);

@@ -94,10 +94,10 @@ export class Collaborateur extends Personne{
     @Field(type => Int,{nullable:true})
     evaluation?: number;
 
-    @ManyToOne(()=>Equipe, equipe=>equipe.collaborateurs, {onDelete: 'CASCADE'})
+    @ManyToOne(()=>Equipe, equipe=>equipe.collaborateurs)
     @IsOptional()
     @Field(type=> Equipe,{nullable:true})
-    equipe? :Equipe;
+    equipe? :Equipe;w
 
     // @Column()
     // @IsOptional()

@@ -44,10 +44,10 @@ export class UpdateCvInput extends PartialType(CreateCvInput) {
     @Field({nullable:true})
     interets?: string;
 
-    @IsOptional()
-    @IsString()
-    @Field(type => [String],{nullable:true})
-    competences?:string[];
+    // @IsOptional()
+    // @IsString()
+    // @Field(type => [String],{nullable:true})
+    // competences?:string[];
 
     @IsOptional()
     @IsString()

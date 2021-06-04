@@ -18,7 +18,6 @@ scalar DateTime
 type Competence {
   id: Int!
   nom: String!
-  version: Int
   cvs: [Cv!]!
 }
 
@@ -28,14 +27,13 @@ type Cv {
   statutCV: StatutCV!
   activiteAssociatives: String
   certificats: String
-  competences: [String!]!
   langues: [String!]!
   experiences: String
   formations: String
   projets: String
   interets: String
   personne: Personne!
-  skills: [Competence!]
+  competences: [Competence!]
   CvPersonne: Cv!
 }
 
@@ -145,11 +143,14 @@ type Connexion {
 }
 
 type Query {
+  createIndexCol: Boolean!
+  createDataCol: Boolean!
+  searchCol(mot: String!): [Collaborateur!]!
   findCols(pole: Int): [Collaborateur!]!
   findCol(idCol: Int!): Collaborateur
   findFilterCols(selectedComp: [String!], selectedPoste: [String!], selectedEquipes: [Int!], selectedPoles: [Int!]): [Collaborateur!]!
   findFilteredCols(filterInput: FilterInput!): [Collaborateur!]!
-  findFilterColsRole(selectedRoles: [UserRole!]!): [Collaborateur!]!
+  findFilterUsers(selectedPermissions: [UserPermission!], selectedRoles: [UserRole!]): [Collaborateur!]!
   findPoles: [Pole!]!
   findPole(idPole: Int!): Pole!
   findPoleRp(rpId: Int!): Pole!
@@ -157,6 +158,8 @@ type Query {
   findEquipe(idEquipe: Int!): Equipe!
   findEquipesPole(idPoles: [Int!]!): [Equipe!]!
   findPostes: [Collaborateur!]!
+  findRoles: [Collaborateur!]!
+  findPermissions: [Collaborateur!]!
   findnotifs: [Notification!]!
   findnotif(idNotif: Int!): Notification!
   findEntretiens: [Entretien!]!
@@ -167,12 +170,17 @@ type Query {
   findCompetences: [Cv!]!
   getCvsMail: Boolean!
   extractCv: Boolean!
+  extractOneCv(file: String!): Boolean!
   getTextPdf: Boolean!
   addCvs: Boolean!
   findAllCompetences: [Competence!]!
   findCompetence(idComp: Int!): Competence!
+  createIndex: Boolean!
+  createData: Boolean!
+  search(mot: String!): [Personne!]!
   findPersonnes: [Personne!]!
   findPersonne(idPersonne: Int!): Personne!
+  findPersonnesId(ids2: [Int!], ids1: [Int!]): [Personne!]!
   findFilterCands(selectedComp: [String!]): [Personne!]!
   findCandidatures: [Candidature!]!
   findCandidature(idCandidature: Int!): Candidature!
@@ -193,12 +201,14 @@ type Mutation {
   createCv(createCvInput: CreateCvInput!): Cv!
   updateCv(updateCvInput: UpdateCvInput!, idCv: Int!): Cv!
   removeCv(idCv: Int!): Boolean!
+  uploadSigleFile(upload: Upload): Boolean!
   createCompetence(createCompetenceInput: CreateCompetenceInput!): Competence!
   updateCompetence(updateCompetenceInput: UpdateCompetenceInput!, idCompetence: Int!): Competence!
   updateRecommande(value: Boolean!, idPersonne: Int!): Boolean!
   createPersonne(createPersonneInput: CreatePersonneInput!): Personne!
   updatePersonne(updatePersonneInput: UpdatePersonneInput!, idPersonne: Int!): Personne!
   removePersonne(idPersonne: Int!): Boolean!
+  removeCandidat(idCand: Int!): Boolean!
   restorePersonne(idPersonne: Int!): Personne!
   login(motDePasse: String!, nomUtilisateur: String!): Connexion!
 }
@@ -261,14 +271,12 @@ input UpdateCvInput {
   formations: String
   projets: String
   interets: String
-  competences: [String!]
   langues: [String!]
-  skills: [CreateCompetenceInput!]
+  competences: [CreateCompetenceInput!]
 }
 
 input CreateCompetenceInput {
   nom: String!
-  version: Int
 }
 
 input UpdateEquipeInput {
@@ -299,14 +307,15 @@ input CreateCvInput {
   formations: String
   projets: String
   interets: String
-  competences: [String!]
   langues: [String!]
-  skills: [CreateCompetenceInput!]
+  competences: [CreateCompetenceInput!]
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 input UpdateCompetenceInput {
   nom: String
-  version: Int
 }
 
 input CreatePersonneInput {

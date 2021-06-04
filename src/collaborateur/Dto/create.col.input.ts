@@ -5,6 +5,7 @@ import { UserPermission } from 'src/enum/UserPermission';
 import { Index } from 'typeorm';
 import { UserRole } from '../../enum/UserRole';
 import { Equipe } from './../entities/equipe.entity';
+import { CreateEquipeInput } from './create.equipe.input';
 
 @InputType()//representation mta3 input = dto
 export class CreateColInput extends CreatePersonneInput{
@@ -27,7 +28,6 @@ export class CreateColInput extends CreatePersonneInput{
 
     @IsString()
     @IsNotEmpty()
-    @IsAlpha()
     @Field()
     poste: string;
 
@@ -89,8 +89,8 @@ export class CreateColInput extends CreatePersonneInput{
     // equipeId :number;
 
     // @IsOptional()
-    // @Field(type => Equipe, {nullable:true})
-    // equipe? :Equipe;
+    // @Field(type => CreateEquipeInput, {nullable:true})
+    // equipe? :CreateEquipeInput;
 
 
     // @IsNumber()

@@ -25,6 +25,8 @@ import { PersonneModule } from './candidat/personne.module';
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: join(process.cwd(),'schema.gql'),
+      uploads: true,
+      context: req => ({ req })
     }),
     CollaborateurModule,
     NotificationModule,

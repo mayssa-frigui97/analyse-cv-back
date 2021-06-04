@@ -45,9 +45,9 @@ export class CreateCvInput {
     @Field({nullable:true})
     interets?: string;
     
-    @IsOptional()
-    @Field(type => [String],{nullable:true})
-    competences?:string[];
+    // @IsOptional()
+    // @Field(type => [String],{nullable:true})
+    // competences?:string[];
 
     @IsOptional()
     @Field(type => [String],{nullable:true})
@@ -55,5 +55,5 @@ export class CreateCvInput {
 
     @IsOptional()
     @Field(type => [CreateCompetenceInput],{nullable:true})
-    skills? :CreateCompetenceInput[];
+    competences? :CreateCompetenceInput[];
 }

@@ -13,10 +13,28 @@ import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { authGuard } from 'src/auth/Guards/auth.guard';
 import { Roles } from 'src/decorators/role.decorator';
 import { RoleGuard } from './../auth/Guards/role.guard';
+import { UserPermission } from 'src/enum/UserPermission';
 
 @Resolver((of) => Collaborateur)
 export class CollaborateurResolver {
   constructor(private collaborateurService: CollaborateurService) {}
+
+  /*************Requests ElasticSearch********** */
+
+  @Query((returns) => Boolean)
+  createIndexCol():Promise<boolean> {
+    return this.collaborateurService.createIndex();
+  }
+
+  @Query((returns) => Boolean)//fonctionnelle
+  createDataCol():Promise<boolean> {
+    return this.collaborateurService.createData();
+  }
+
+  @Query((returns) => [Collaborateur])
+  searchCol(@Args('mot') mot: String):Promise<Collaborateur[]> {
+    return this.collaborateurService.search(mot);
+  }
 
   /***********Colaborateur***********/
 
@@ -65,12 +83,6 @@ export class CollaborateurResolver {
     selectedPoles?: number[],
     @Args('selectedEquipes', { type: () => [Int], nullable: true })
     selectedEquipes?: number[],
-    // @Args('selectedNiv', { type: () => [String], nullable: true })
-    // selectedNiv?: string[],
-    // @Args('selectedSpec', { type: () => [String], nullable: true })
-    // selectedSpec?: string[],
-    // @Args('selectedUniver', { type: () => [String], nullable: true })
-    // selectedUniver?: string[],
     @Args('selectedPoste', { type: () => [String], nullable: true })
     selectedPoste?: string[],
     @Args('selectedComp', { type: () => [String], nullable: true })
@@ -94,11 +106,13 @@ export class CollaborateurResolver {
 
   @Query((returns) => [Collaborateur])
   // @Roles(UserRole.ADMIN)
-  findFilterColsRole(
-    @Args('selectedRoles', { type: () => [UserRole] })
-    selectedRoles: UserRole[],
+  findFilterUsers(
+    @Args('selectedRoles', { type: () => [UserRole] , nullable: true })
+    selectedRoles?: UserRole[],
+    @Args('selectedPermissions', { type: () => [UserPermission] , nullable: true })
+    selectedPermissions?: UserPermission[],
   ): Promise<Collaborateur[]> {
-    return this.collaborateurService.getFilterRole(selectedRoles);
+    return this.collaborateurService.getFilterUsers(selectedRoles,selectedPermissions);
   }
 
   // @ResolveField(returns => Equipe)
@@ -153,5 +167,15 @@ export class CollaborateurResolver {
   @Query(() => [Collaborateur], { name: 'findPostes' })
   findPostes() {
     return this.collaborateurService.findPostes();
+  }
+
+  @Query(() => [Collaborateur], { name: 'findRoles' })
+  findRoles() {
+    return this.collaborateurService.findRoles();
+  }
+
+  @Query(() => [Collaborateur], { name: 'findPermissions' })
+  findPermission() {
+    return this.collaborateurService.findPermissions();
   }
 }
