@@ -9,6 +9,7 @@ import { UpdateCompetenceInput } from './dto/update-competence.input';
 import { CreateCompetenceInput } from './dto/create-competence.input';
 import { createReadStream, createWriteStream } from 'fs';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
+import { Upload } from './upload';
 
 @Resolver(() => Cv)
 export class CvResolver {
@@ -27,13 +28,13 @@ export class CvResolver {
   }
 
   @Query(() => Cv, { name: 'findCv' })
-  findOneCV(@Args('idCv', { type: () => Int }) idCV: number) {
+  findOneCv(@Args('idCv', { type: () => Int }) idCV: number) {
     return this.cvService.findOneCV(idCV);
   }
 
-  @Query(() => Cv, { name: 'findCvPersonne' })
-  findCvPersonne(@Args('idPersonne', { type: () => Int }) idPersonne: number) {
-    return this.cvService.findCvPersonne(idPersonne);
+  @Query(() => Cv)
+  findCvByMail(@Args('email', { type: () => String }) email: string) {
+    return this.cvService.findCvByMail(email);
   }
 
   @Mutation(() => Cv)
@@ -67,19 +68,14 @@ export class CvResolver {
     return this.cvService.getCvsMail();
   }
   
-  @Query((returns) => Boolean)
-  extractCv():Promise<boolean> {
-    return this.cvService.extractCv();
-  }
+  // @Query((returns) => Boolean)
+  // extractCvs():Promise<boolean> {
+  //   return this.cvService.extractCv();
+  // }
   
   @Query((returns) => Boolean)
   extractOneCv(@Args('file') file: string):Promise<boolean> {
     return this.cvService.extractOneCv(file);
-  }
-  
-  @Query((returns) => Boolean)
-  getTextPdf():Promise<boolean> {
-    return this.cvService.getTextPdf();
   }
   
   @Query((returns) => Boolean)
@@ -88,25 +84,20 @@ export class CvResolver {
   }
 
   @Mutation(() => Boolean)
-  async uploadSigleFile(
-    @Args({ type: () => GraphQLUpload, name: 'upload', nullable: true })
-    upload: FileUpload,
-  ) {
-    console.log(upload.filename, upload.mimetype);
-    return true;
-  }
+    async uploadFile(@Args({name: 'file', type: () => GraphQLUpload})
+    {
+        createReadStream,
+        filename
+    }: Upload): Promise<boolean> {
+        return new Promise(async (resolve, reject) => 
+            createReadStream()
+                .pipe(createWriteStream(`./${filename}`))
+                .on('finish', () => resolve(true))
+                .on('error', () => reject(false))
+        );
+    }
 
-  // @Query((returns) => Boolean)
-  // bdToJson():Promise<boolean> {
-  //   return this.cvService.bdToJson();
-  // }
-
-  //   @Query((returns) => String)
-  //   getAvatar(@Args('email') email: string):Promise<String> {
-  //     return this.cvService.getAvatar(email);
-  // }
-
-  //******************competence********** */
+  /******************competence********** */
 
   @Mutation(() => Competence)
   createCompetence(@Args('createCompetenceInput') createCompetenceInput: CreateCompetenceInput) {

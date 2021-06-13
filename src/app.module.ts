@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
@@ -10,6 +10,7 @@ import { EntretienModule } from './entretien/entretien.module';
 import { CvModule } from './cv/cv.module';
 import { AuthModule } from './auth/auth.module';
 import { PersonneModule } from './candidat/personne.module';
+
 
 @Module({
   imports: [
@@ -25,8 +26,8 @@ import { PersonneModule } from './candidat/personne.module';
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: join(process.cwd(),'schema.gql'),
-      uploads: true,
-      context: req => ({ req })
+      uploads: false,
+      context: ({req}) => ({ headers : req.headers })
     }),
     CollaborateurModule,
     NotificationModule,
@@ -38,4 +39,21 @@ import { PersonneModule } from './candidat/personne.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer
+  //     .apply(LoggerMiddleware)
+  //     .forRoutes('cv');
+  // }implements NestModule
+  
+
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer
+  //     .apply(AuthorizationMiddleware)
+  //     .forRoutes('cv');
+  // }
+}
+// function LoggerMiddleware(LoggerMiddleware: any) {
+//   throw new Error('Function not implemented.');
+// }
+

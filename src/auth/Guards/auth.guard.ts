@@ -5,6 +5,7 @@ import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class authGuard  extends AuthGuard('jwt'){
+  
   getRequest(context: ExecutionContext) {
     const ctx = GqlExecutionContext.create(context);
     return ctx.getContext().req;

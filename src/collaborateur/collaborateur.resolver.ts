@@ -2,7 +2,7 @@ import { Equipe } from './entities/equipe.entity';
 import { Pole } from './entities/pole.entity';
 import { CreateColInput } from './Dto/create.col.input';
 import { CollaborateurService } from './collaborateur.service';
-import {Resolver,Query,Mutation,Args,Int} from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { Collaborateur } from './entities/collaborateur.entity';
 import { UpdateColInput } from './Dto/update.col.input';
 import { CreatePoleInput } from './Dto/create.pole.input';
@@ -22,24 +22,24 @@ export class CollaborateurResolver {
   /*************Requests ElasticSearch********** */
 
   @Query((returns) => Boolean)
-  createIndexCol():Promise<boolean> {
+  createIndexCol(): Promise<boolean> {
     return this.collaborateurService.createIndex();
   }
 
-  @Query((returns) => Boolean)//fonctionnelle
-  createDataCol():Promise<boolean> {
+  @Query((returns) => Boolean) //fonctionnelle
+  createDataCol(): Promise<boolean> {
     return this.collaborateurService.createData();
   }
 
   @Query((returns) => [Collaborateur])
-  searchCol(@Args('mot') mot: String):Promise<Collaborateur[]> {
+  searchCol(@Args('mot') mot: string): Promise<Collaborateur[]> {
     return this.collaborateurService.search(mot);
   }
 
   /***********Colaborateur***********/
 
   @Query((returns) => [Collaborateur])
-  // @UseGuards(authGuard,RoleGuard)
+  // @UseGuards(authGuard)
   // @Roles(UserRole.RH, UserRole.ADMIN, UserRole.RP, UserRole.TEAMLEADER)
   findCols(
     @Args('pole', { type: () => Int, nullable: true }) pole?: number,
@@ -48,6 +48,7 @@ export class CollaborateurResolver {
   }
 
   @Query((returns) => Collaborateur, { nullable: true })
+  // @UseGuards(authGuard)
   findCol(
     @Args('idCol', { type: () => Int }) idCol: number,
   ): Promise<Collaborateur> {
@@ -72,7 +73,7 @@ export class CollaborateurResolver {
   @Mutation(() => Boolean)
   // @Roles(UserRole.RH)
   removeCol(@Args('idCol', { type: () => Int }) idCol: number) {
-    var supp = this.collaborateurService.removeCol(idCol);
+    const supp = this.collaborateurService.removeCol(idCol);
     return supp;
   }
 
@@ -107,12 +108,10 @@ export class CollaborateurResolver {
   @Query((returns) => [Collaborateur])
   // @Roles(UserRole.ADMIN)
   findFilterUsers(
-    @Args('selectedRoles', { type: () => [UserRole] , nullable: true })
+    @Args('selectedRoles', { type: () => [UserRole], nullable: true })
     selectedRoles?: UserRole[],
-    @Args('selectedPermissions', { type: () => [UserPermission] , nullable: true })
-    selectedPermissions?: UserPermission[],
   ): Promise<Collaborateur[]> {
-    return this.collaborateurService.getFilterUsers(selectedRoles,selectedPermissions);
+    return this.collaborateurService.getFilterUsers(selectedRoles);
   }
 
   // @ResolveField(returns => Equipe)

@@ -246,13 +246,10 @@ export class CollaborateurService {
         return query.getMany();
     }
 
-    async getFilterUsers(selectedRoles: UserRole[],selectedPermissions: UserPermission[]):Promise<Collaborateur[]>{
+    async getFilterUsers(selectedRoles: UserRole[]):Promise<Collaborateur[]>{
         const query = this.collaborateurRepository.createQueryBuilder('collaborateur');
         if(selectedRoles){
           query.where('collaborateur.role in (:selectedRoles)', { selectedRoles })
-        }
-        if(selectedPermissions){
-          query.andWhere('collaborateur.permission in (:selectedPermissions)', { selectedPermissions })
         }
           query.leftJoinAndSelect('collaborateur.equipe', 'equipe')
           .leftJoinAndSelect('equipe.pole', 'pole')
@@ -266,23 +263,6 @@ export class CollaborateurService {
           .orderBy('collaborateur.nom');
         return query.getMany();
     }
-
-    async getFilterFormation(selectedNiv: string[], selectedSpec: string[],selectedUniver: string[]):Promise<Collaborateur[]>{
-        const query = this.collaborateurRepository.createQueryBuilder('collaborateur');
-        query
-          .where('collaborateur.role in (:selectedRoles)', { selectedUniver })
-          .leftJoinAndSelect('collaborateur.equipe', 'equipe')
-          .leftJoinAndSelect('equipe.pole', 'pole')
-          .leftJoinAndSelect('pole.rp', 'rp')
-          .leftJoinAndSelect('equipe.teamleader', 'teamleader')
-          .leftJoinAndSelect('collaborateur.notifications', 'notifications')
-          .leftJoinAndSelect('collaborateur.cv', 'cv')
-          .leftJoinAndSelect('cv.competences','competences')
-          .leftJoinAndSelect('collaborateur.candidatures', 'candidatures')
-          .leftJoinAndSelect('candidatures.entretiens', 'entretiens');
-        return query.getMany();
-    }
-
     async findPoleRp(idRP: number):Promise<Pole>{
         const query = this.poleRepository.createQueryBuilder('pole');
         query.where('rp.id= :idRP',{idRP})

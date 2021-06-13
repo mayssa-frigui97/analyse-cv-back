@@ -56,98 +56,6 @@ export class PersonneService {
     return [];
   }
 
-  // async searchFormation(formation:string): Promise<Personne[]> {
-  //   let candidats : Personne[]=[];
-  //   let index = "cvs";
-  //   let body;
-  //   if(formation == "Licence"){
-  //     body = {
-  //       query: {
-  //         bool: {
-  //           must: [
-  //             {
-  //               query_string: {
-  //                 fields: ['cv.formations', 'cv.experiences'],
-  //                 query: 'Licence licence',
-  //               },
-  //             },
-  //           ],
-  //           must_not: [
-  //             {
-  //               query_string: {
-  //                 fields: ['cv.formations', 'cv.experiences'],
-  //                 query: "ingénieur d'ingénieur Master master ingénieurie d'ingénieurs",
-  //               },
-  //             }
-  //           ]
-  //         },
-  //       },
-  //     };
-  //   }
-  //   else if (formation == "Master"){
-  //     body = {
-  //       query: {
-  //         bool: {
-  //           must: [
-  //             {
-  //               query_string: {
-  //                 fields : ["cv.formations","cv.experiences"],
-  //                 query : "master Master"
-  //               },
-  //             },
-  //           ],
-  //           must_not: [
-  //             {
-  //               query_string: {
-  //                 fields: ['cv.formations', 'cv.experiences'],
-  //                 query: "Doctorat doctorat",
-  //               },
-  //             }
-  //           ]
-  //         }
-          
-  //       }
-  //     };
-  //   }
-  //   else if(formation == "Doctorat"){
-  //     body = {
-  //       query: {
-  //         query_string: {
-  //           fields : ["cv.formations","cv.experiences"],
-  //           query : "doctorat Doctorat"
-  //         }
-  //       }
-  //     };
-  //   }
-  //   else{
-  //     body = {
-  //     query: {
-  //       query_string: {
-  //         fields : ["cv.formations","cv.experiences"],
-  //         query : "ingénieur d'ingénieur ingénieurie d'ingénieurs"
-  //       }
-  //     }
-  //   };
-  //   }
-  //   console.log(`résultat des personnes recherchées:`);
-  //   await client.search({index: index, body: body})
-  //   .then(results => {
-  //     console.log(`found ${results.hits.total.value} items in ${results.took}ms`);
-  //     if (results.hits.total > 0) console.log(`returned person name:`);
-  //     results.hits.hits.forEach((hit, index) => {
-  //     console.log(`\t${hit._id} - ${hit._source.nom} (score: ${hit._score})`);
-  //     candidats.push(hit._source);
-  //     });
-  //   })
-  //   .catch(console.error);
-  //   if(candidats !== []){
-  //     console.log("résultat trouvée!!");
-  //     return candidats;
-  //   }
-  //   console.log("pas de résultat trouvée!!")
-  //   return [];
-  // }
-
   async createData(): Promise<boolean> {
     this.findAllPersonnes().then((personnes) => {
       personnes.forEach((personne) => {
@@ -251,14 +159,6 @@ export class PersonneService {
     return await this.personneRepository.save(newPersonne);
   }
 
-//   async findCvPersonne(Personne: Personne): Promise<Cv> {
-//       const id= Personne.cv.id;
-//       const query = this.cvRepository.createQueryBuilder('cv');
-//       query.where('cv.id= :id',{id})
-//       .leftJoinAndSelect('cv.Personne','Personne');
-//       return query.getOne();
-//   }
-
   async removePersonne(idCand: number) {
     var supp = false;
     const personne = await this.findOnePersonne(idCand);
@@ -288,9 +188,6 @@ export class PersonneService {
 
   async getFilterCand(selectedComp?: string[]):Promise<Personne[]>{
     const query = this.personneRepository.createQueryBuilder('Personne');
-      // .orWhere('formations.universite in (:selectedUniver)', { selectedUniver })
-      // .orWhere('formations.niveau in (:selectedNiv)', { selectedNiv })
-      // .orWhere('formations.specialite in (:selectedSpec)',{selectedSpec})
       if(selectedComp){
         query.andWhere('competences.nom in (:selectedComp)',{selectedComp})
       }

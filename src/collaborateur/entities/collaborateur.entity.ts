@@ -85,7 +85,7 @@ export class Collaborateur extends Personne{
     @Column({
         type: "enum",
         enum: UserPermission,
-        default: UserPermission.VISITEUR
+        default: UserPermission.UTILISATEUR
     })
     @Field(type => UserPermission)
     permission :UserPermission;

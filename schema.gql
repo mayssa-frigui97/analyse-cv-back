@@ -118,7 +118,6 @@ enum UserRole {
 enum UserPermission {
   SUPER
   ADMINISTRATEUR
-  VISITEUR
   UTILISATEUR
 }
 
@@ -137,11 +136,6 @@ type Pole {
   rp: Collaborateur!
 }
 
-type Connexion {
-  access_token: String!
-  user: Collaborateur!
-}
-
 type Query {
   createIndexCol: Boolean!
   createDataCol: Boolean!
@@ -150,7 +144,7 @@ type Query {
   findCol(idCol: Int!): Collaborateur
   findFilterCols(selectedComp: [String!], selectedPoste: [String!], selectedEquipes: [Int!], selectedPoles: [Int!]): [Collaborateur!]!
   findFilteredCols(filterInput: FilterInput!): [Collaborateur!]!
-  findFilterUsers(selectedPermissions: [UserPermission!], selectedRoles: [UserRole!]): [Collaborateur!]!
+  findFilterUsers(selectedRoles: [UserRole!]): [Collaborateur!]!
   findPoles: [Pole!]!
   findPole(idPole: Int!): Pole!
   findPoleRp(rpId: Int!): Pole!
@@ -166,12 +160,10 @@ type Query {
   findEntretien(idEnt: Int!): Entretien!
   findCvs: [Cv!]!
   findCv(idCv: Int!): Cv!
-  findCvPersonne(idPersonne: Int!): Cv!
+  findCvByMail(email: String!): Cv!
   findCompetences: [Cv!]!
   getCvsMail: Boolean!
-  extractCv: Boolean!
   extractOneCv(file: String!): Boolean!
-  getTextPdf: Boolean!
   addCvs: Boolean!
   findAllCompetences: [Competence!]!
   findCompetence(idComp: Int!): Competence!
@@ -184,7 +176,6 @@ type Query {
   findFilterCands(selectedComp: [String!]): [Personne!]!
   findCandidatures: [Candidature!]!
   findCandidature(idCandidature: Int!): Candidature!
-  getUserAuth: Collaborateur!
 }
 
 input FilterInput {
@@ -201,7 +192,7 @@ type Mutation {
   createCv(createCvInput: CreateCvInput!): Cv!
   updateCv(updateCvInput: UpdateCvInput!, idCv: Int!): Cv!
   removeCv(idCv: Int!): Boolean!
-  uploadSigleFile(upload: Upload): Boolean!
+  uploadFile(file: Upload!): Boolean!
   createCompetence(createCompetenceInput: CreateCompetenceInput!): Competence!
   updateCompetence(updateCompetenceInput: UpdateCompetenceInput!, idCompetence: Int!): Competence!
   updateRecommande(value: Boolean!, idPersonne: Int!): Boolean!
@@ -210,7 +201,7 @@ type Mutation {
   removePersonne(idPersonne: Int!): Boolean!
   removeCandidat(idCand: Int!): Boolean!
   restorePersonne(idPersonne: Int!): Personne!
-  login(motDePasse: String!, nomUtilisateur: String!): Connexion!
+  login(motDePasse: String!, nomUtilisateur: String!): Boolean!
 }
 
 input CreateColInput {
