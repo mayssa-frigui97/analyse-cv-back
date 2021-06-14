@@ -1,15 +1,17 @@
-import { ExecutionContext, HttpException, HttpStatus, Injectable, CanActivate } from "@nestjs/common";
-import { GqlExecutionContext } from "@nestjs/graphql";
-import { AuthGuard } from "@nestjs/passport";
+/* eslint-disable prettier/prettier */
+import { ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
+import { AuthGuard } from '@nestjs/passport';
+import { CanActivate } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 
 @Injectable()
-export class authGuard  extends AuthGuard('jwt'){
-  
+export class authGuard extends AuthGuard('jwt'){
   getRequest(context: ExecutionContext) {
     const ctx = GqlExecutionContext.create(context);
     return ctx.getContext().req;
   }
+
 
   // async canActivate(context: ExecutionContext): Promise<boolean> {
   //   const ctx = GqlExecutionContext.create(context).getContext();

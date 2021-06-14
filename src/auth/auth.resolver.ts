@@ -16,16 +16,20 @@ export class AuthResolver {
     private authService: AuthService,
   ) {}
 
-  @Mutation(() => Boolean)
+  @Query(() => Connexion)
   async login(
     @Args('nomUtilisateur') nomUtilisateur: string,
     @Args('motDePasse') motDePasse: string,
   ) {
-    try {
-      return this.authService.login({ nomUtilisateur, motDePasse });
-    } catch (err) {
-      console.error(err);
-    }
+    return this.authService.login({ nomUtilisateur, motDePasse });
+  }
+
+  @Mutation(() => Boolean)
+  async addUserLdap(
+    @Args('nomUtilisateur') nomUtilisateur: string,
+    @Args('motDePasse') motDePasse: string,
+  ) {
+    return this.authService.addUser({ nomUtilisateur, motDePasse });
   }
 
   // @Mutation(() => Connexion)

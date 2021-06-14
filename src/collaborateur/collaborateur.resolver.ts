@@ -1,3 +1,7 @@
+/* eslint-disable prettier/prettier */
+// eslint-disable-next-line prettier/prettier
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable prettier/prettier */
 import { Equipe } from './entities/equipe.entity';
 import { Pole } from './entities/pole.entity';
 import { CreateColInput } from './Dto/create.col.input';
@@ -12,7 +16,7 @@ import { isNullableType } from 'graphql';
 import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { authGuard } from 'src/auth/Guards/auth.guard';
 import { Roles } from 'src/decorators/role.decorator';
-import { RoleGuard } from './../auth/Guards/role.guard';
+import { RolesGuard } from './../auth/Guards/role.guard';
 import { UserPermission } from 'src/enum/UserPermission';
 
 @Resolver((of) => Collaborateur)
@@ -39,16 +43,18 @@ export class CollaborateurResolver {
   /***********Colaborateur***********/
 
   @Query((returns) => [Collaborateur])
-  // @UseGuards(authGuard)
-  // @Roles(UserRole.RH, UserRole.ADMIN, UserRole.RP, UserRole.TEAMLEADER)
+  @UseGuards(authGuard,RolesGuard)
+  @Roles(UserRole.RH, UserRole.RP, UserRole.TEAMLEADER)
   findCols(
     @Args('pole', { type: () => Int, nullable: true }) pole?: number,
+    @Args('equipe', { type: () => Int, nullable: true }) equipe?: number,
   ): Promise<Collaborateur[]> {
-    return this.collaborateurService.findAllCols(pole);
+    return this.collaborateurService.findAllCols(pole,equipe);
   }
 
   @Query((returns) => Collaborateur, { nullable: true })
-  // @UseGuards(authGuard)
+  @UseGuards(authGuard,RolesGuard)
+  @Roles(UserRole.COLLABORATEUR,UserRole.RH, UserRole.RP, UserRole.TEAMLEADER)
   findCol(
     @Args('idCol', { type: () => Int }) idCol: number,
   ): Promise<Collaborateur> {
@@ -71,14 +77,16 @@ export class CollaborateurResolver {
   }
 
   @Mutation(() => Boolean)
-  // @Roles(UserRole.RH)
+  @UseGuards(authGuard,RolesGuard)
+  @Roles(UserRole.RH)
   removeCol(@Args('idCol', { type: () => Int }) idCol: number) {
     const supp = this.collaborateurService.removeCol(idCol);
     return supp;
   }
 
   @Query((returns) => [Collaborateur])
-  // @Roles(UserRole.RH, UserRole.ADMIN, UserRole.RP, UserRole.TEAMLEADER)
+  @UseGuards(authGuard,RolesGuard)
+  @Roles(UserRole.RH, UserRole.RP, UserRole.TEAMLEADER)
   findFilterCols(
     @Args('selectedPoles', { type: () => [Int], nullable: true })
     selectedPoles?: number[],
@@ -106,7 +114,8 @@ export class CollaborateurResolver {
   }
 
   @Query((returns) => [Collaborateur])
-  // @Roles(UserRole.ADMIN)
+  @UseGuards(authGuard,RolesGuard)
+  @Roles(UserRole.RH)
   findFilterUsers(
     @Args('selectedRoles', { type: () => [UserRole], nullable: true })
     selectedRoles?: UserRole[],
@@ -164,8 +173,11 @@ export class CollaborateurResolver {
   }
 
   @Query(() => [Collaborateur], { name: 'findPostes' })
-  findPostes() {
-    return this.collaborateurService.findPostes();
+  findPostes(
+    @Args('pole', { type: () => Int, nullable: true }) pole?: number,
+    @Args('equipe', { type: () => Int, nullable: true }) equipe?: number
+  ) {
+    return this.collaborateurService.findPostes(pole,equipe);
   }
 
   @Query(() => [Collaborateur], { name: 'findRoles' })

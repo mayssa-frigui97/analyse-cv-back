@@ -136,11 +136,16 @@ type Pole {
   rp: Collaborateur!
 }
 
+type Connexion {
+  access_token: String!
+  user: Collaborateur!
+}
+
 type Query {
   createIndexCol: Boolean!
   createDataCol: Boolean!
   searchCol(mot: String!): [Collaborateur!]!
-  findCols(pole: Int): [Collaborateur!]!
+  findCols(equipe: Int, pole: Int): [Collaborateur!]!
   findCol(idCol: Int!): Collaborateur
   findFilterCols(selectedComp: [String!], selectedPoste: [String!], selectedEquipes: [Int!], selectedPoles: [Int!]): [Collaborateur!]!
   findFilteredCols(filterInput: FilterInput!): [Collaborateur!]!
@@ -151,7 +156,7 @@ type Query {
   findEquipes: [Equipe!]!
   findEquipe(idEquipe: Int!): Equipe!
   findEquipesPole(idPoles: [Int!]!): [Equipe!]!
-  findPostes: [Collaborateur!]!
+  findPostes(equipe: Int, pole: Int): [Collaborateur!]!
   findRoles: [Collaborateur!]!
   findPermissions: [Collaborateur!]!
   findnotifs: [Notification!]!
@@ -176,6 +181,7 @@ type Query {
   findFilterCands(selectedComp: [String!]): [Personne!]!
   findCandidatures: [Candidature!]!
   findCandidature(idCandidature: Int!): Candidature!
+  login(motDePasse: String!, nomUtilisateur: String!): Connexion!
 }
 
 input FilterInput {
@@ -201,7 +207,7 @@ type Mutation {
   removePersonne(idPersonne: Int!): Boolean!
   removeCandidat(idCand: Int!): Boolean!
   restorePersonne(idPersonne: Int!): Personne!
-  login(motDePasse: String!, nomUtilisateur: String!): Boolean!
+  addUserLdap(motDePasse: String!, nomUtilisateur: String!): Boolean!
 }
 
 input CreateColInput {
@@ -221,7 +227,6 @@ input CreateColInput {
   salaire: Int!
   dateEmb: DateTime!
   nomUtilisateur: String!
-  motDePasse: String!
   role: UserRole!
   permission: UserPermission!
   evaluation: Int
@@ -246,7 +251,6 @@ input UpdateColInput {
   salaire: Int
   dateEmb: DateTime
   nomUtilisateur: String
-  motDePasse: String
   role: UserRole
   permission: UserPermission
   evaluation: Int
