@@ -40,6 +40,22 @@ export class CollaborateurResolver {
     return this.collaborateurService.search(mot);
   }
 
+  @Query((returns) => [Collaborateur])
+  searchEquipe(
+    @Args('mot') mot: string,
+    @Args('equipe') equipe: string
+    ): Promise<Collaborateur[]> {
+    return this.collaborateurService.searchEquipe(mot,equipe);
+  }
+
+  @Query((returns) => [Collaborateur])
+  searchPole(
+    @Args('mot') mot: string,
+    @Args('pole') pole: string
+    ): Promise<Collaborateur[]> {
+    return this.collaborateurService.searchPole(mot,pole);
+  }
+
   /***********Colaborateur***********/
 
   @Query((returns) => [Collaborateur])

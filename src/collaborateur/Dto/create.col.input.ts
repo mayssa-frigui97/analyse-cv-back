@@ -17,6 +17,7 @@ import { CreatePersonneInput } from 'src/candidat/dto/create-personne.input';
 import { UserPermission } from 'src/enum/UserPermission';
 import { Index } from 'typeorm';
 import { UserRole } from '../../enum/UserRole';
+import { Equipe } from '../entities/equipe.entity';
 
 @InputType() //representation mta3 input = dto
 export class CreateColInput extends CreatePersonneInput {
@@ -88,8 +89,8 @@ export class CreateColInput extends CreatePersonneInput {
   // equipeId :number;
 
   // @IsOptional()
-  // @Field(type => CreateEquipeInput, {nullable:true})
-  // equipe? :CreateEquipeInput;
+  // @Field(type => Equipe, {nullable:true})
+  // equipe? :Equipe;
 
   // @IsNumber()
   // @IsNotEmpty()

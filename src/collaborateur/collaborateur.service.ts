@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Equipe } from './entities/equipe.entity';
 import { UpdateColInput } from './Dto/update.col.input';
 import { CreateColInput } from './Dto/create.col.input';
@@ -7,12 +8,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pole } from './entities/pole.entity';
 import { CreatePoleInput } from './Dto/create.pole.input';
-import { Personne } from 'src/candidat/entities/personne.entity';
 import { Cv } from 'src/cv/entities/cv.entity';
 import { FilterInput } from './Dto/filter.input';
 import { UserRole } from 'src/enum/UserRole';
-import * as jwt from 'jsonwebtoken';
-import { UserPermission } from 'src/enum/UserPermission';
+import { response } from 'express';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const elasticsearch = require('elasticsearch');
 
@@ -51,6 +50,98 @@ export class CollaborateurService {
     console.log(
       `résultat des personnes recherchées pour :'${body.query.query_string.query}'`,
     );
+    await client
+      .search({ index: index, body: body })
+      .then((results) => {
+        console.log(
+          `found ${results.hits.total.value} items in ${results.took}ms`,
+        );
+        if (results.hits.total > 0) console.log(`returned person name:`);
+        results.hits.hits.forEach((hit, index) => {
+          console.log(
+            `\t${hit._id} - ${hit._source.nom} (score: ${hit._score})`,
+          );
+          cols.push(hit._source);
+        });
+      })
+      .catch(console.error);
+    if (cols !== []) {
+      console.log('résultat trouvée!!');
+      return cols;
+    }
+    console.log('pas de résultat trouvée!!');
+    return [];
+  }
+
+  async searchPole(mot: string, pole: string): Promise<Collaborateur[]> {
+    const cols: Collaborateur[] = [];
+    const index = 'cv';
+    const body = {
+      query: {
+        bool: {
+          must: [
+            {
+              query_string: {
+                query: pole,
+              },
+            },
+            {
+              query_string: {
+                query: mot,
+              },
+            },
+          ],
+        },
+      },
+    };
+
+    console.log(`résultat des personnes recherchées pour :'${mot}'`);
+    await client
+      .search({ index: index, body: body })
+      .then((results) => {
+        console.log(
+          `found ${results.hits.total.value} items in ${results.took}ms`,
+        );
+        if (results.hits.total > 0) console.log(`returned person name:`);
+        results.hits.hits.forEach((hit, index) => {
+          console.log(
+            `\t${hit._id} - ${hit._source.nom} (score: ${hit._score})`,
+          );
+          cols.push(hit._source);
+        });
+      })
+      .catch(console.error);
+    if (cols !== []) {
+      console.log('résultat trouvée!!');
+      return cols;
+    }
+    console.log('pas de résultat trouvée!!');
+    return [];
+  }
+
+  async searchEquipe(mot: string, equipe: string): Promise<Collaborateur[]> {
+    const cols: Collaborateur[] = [];
+    const index = 'cv';
+    const body = {
+      query: {
+        bool: {
+          must: [
+            {
+              query_string: {
+                query: equipe,
+              },
+            },
+            {
+              query_string: {
+                query: mot,
+              },
+            },
+          ],
+        },
+      },
+    };
+
+    console.log(`résultat des personnes recherchées pour :'${mot}'`);
     await client
       .search({ index: index, body: body })
       .then((results) => {
@@ -161,10 +252,6 @@ export class CollaborateurService {
     return query.getOne();
   }
 
-  createToken({ id, nomUtilisateur }: Collaborateur): any {
-    return jwt.sign({ id, nomUtilisateur }, 'secret');
-  }
-
   async findAllCols(
     poleId?: number,
     equipeId?: number,
@@ -205,14 +292,29 @@ export class CollaborateurService {
     return query.getOne();
   }
 
-  async createCol(createColInput: CreateColInput): Promise<Collaborateur> {
-    const newCol = this.collaborateurRepository.create(createColInput);
+  async createCol(createColInput: CreateColInput) {
     const equipeId = createColInput.equipeId;
     const query = this.equipeRepository.createQueryBuilder('equipe');
     query.where('equipe.id= :equipeId', { equipeId });
-    query.getOne().then((equipe) => (newCol.equipe = equipe));
-    return await this.collaborateurRepository.save(newCol);
+    const newCol = this.collaborateurRepository.create(createColInput);
+    const equipe = await query.getOne()
+    // .then((equipe) => {
+      newCol.equipe = equipe;
+      console.log('col', newCol);
+    // });
+    // setTimeout(() => {
+      // console.log('col2', newCol);
+    // }, 500);
+    return this.collaborateurRepository.save(newCol);
   }
+
+  // async createColab(createColInput: CreateColInput): Promise<Collaborateur> {
+  //   let newCol : Collaborateur;
+  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //   this.createCol(createColInput).then((response: Collaborateur, err: any) => {
+  //     newCol = response;
+  //   });
+  // }
 
   async updateCol(
     id: number,

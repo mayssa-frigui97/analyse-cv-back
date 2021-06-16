@@ -138,13 +138,15 @@ type Pole {
 
 type Connexion {
   access_token: String!
-  user: Collaborateur!
+  user: Collaborateur
 }
 
 type Query {
   createIndexCol: Boolean!
   createDataCol: Boolean!
   searchCol(mot: String!): [Collaborateur!]!
+  searchEquipe(equipe: String!, mot: String!): [Collaborateur!]!
+  searchPole(pole: String!, mot: String!): [Collaborateur!]!
   findCols(equipe: Int, pole: Int): [Collaborateur!]!
   findCol(idCol: Int!): Collaborateur
   findFilterCols(selectedComp: [String!], selectedPoste: [String!], selectedEquipes: [Int!], selectedPoles: [Int!]): [Collaborateur!]!
