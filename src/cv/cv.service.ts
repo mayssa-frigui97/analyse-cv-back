@@ -365,7 +365,7 @@ export class CvService {
       imap.openBox('INBOX', true, function (err, box) {
         if (err) throw err;
         imap.search(
-          ['ALL', ['SINCE', 'June 01, 2021']],
+          ['ALL', ['SINCE', 'June 15, 2021']],
           function (err, results) {
             if (err) throw err;
             var f = imap.fetch(results, {
