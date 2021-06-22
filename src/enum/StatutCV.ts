@@ -1,10 +1,10 @@
-import { registerEnumType } from "@nestjs/graphql";
-
+/* eslint-disable prettier/prettier */
+import { registerEnumType } from '@nestjs/graphql';
 
 export enum StatutCV {
-    RECU= 'RECU',
-    ACCEPTE = 'ACCEPTE',
-    REFUSE = 'REFUSE'
-  }
+  RECU = 'RECU',
+  ACCEPTE = 'ACCEPTE',
+  REFUSE = 'REFUSE',
+}
 
-registerEnumType(StatutCV, {name:'StatutCV',});
+registerEnumType(StatutCV, { name: 'StatutCV' });

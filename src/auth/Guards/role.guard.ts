@@ -5,9 +5,9 @@ import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Observable } from 'rxjs';
-import { CollaborateurService } from 'src/collaborateur/collaborateur.service';
-import { ROLES_KEY } from 'src/decorators/role.decorator';
-import { UserRole } from 'src/enum/UserRole';
+import { CollaborateurService } from './../../collaborateur/collaborateur.service';
+import { ROLES_KEY } from './../../decorators/role.decorator';
+import { UserRole } from './../../enum/UserRole';
 
 
 
@@ -91,10 +91,10 @@ export class RolesGuard implements CanActivate {
     const user = ctx.getContext().req.user;
     // const req = context.switchToHttp().getRequest() as any;
     // const user = req.user;
-    console.log("user:",user);
+    // console.log("user:",user);
     const userauth = await this.collaborateurService.findOneCol(user.id);
-    console.log("userauth:",userauth.role);
-    console.log("cond:",roles.includes(userauth.role));
+    // console.log("userauth:",userauth.role);
+    // console.log("cond:",roles.includes(userauth.role));
     return (roles.includes(userauth.role));
 
     // return true;

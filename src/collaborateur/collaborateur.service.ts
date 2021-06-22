@@ -8,9 +8,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pole } from './entities/pole.entity';
 import { CreatePoleInput } from './Dto/create.pole.input';
-import { Cv } from 'src/cv/entities/cv.entity';
+import { Cv } from './../cv/entities/cv.entity';
 import { FilterInput } from './Dto/filter.input';
-import { UserRole } from 'src/enum/UserRole';
+import { UserRole } from './../enum/UserRole';
 import { response } from 'express';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const elasticsearch = require('elasticsearch');
@@ -40,10 +40,11 @@ export class CollaborateurService {
   async search(mot: string): Promise<Collaborateur[]> {
     const cols: Collaborateur[] = [];
     const index = 'cv';
+    const word = '*' + mot + '*';
     const body = {
       query: {
         query_string: {
-          query: mot,
+          query: word,
         },
       },
     };
@@ -76,6 +77,7 @@ export class CollaborateurService {
   async searchPole(mot: string, pole: string): Promise<Collaborateur[]> {
     const cols: Collaborateur[] = [];
     const index = 'cv';
+    const word = '*' + mot + '*';
     const body = {
       query: {
         bool: {
@@ -87,7 +89,7 @@ export class CollaborateurService {
             },
             {
               query_string: {
-                query: mot,
+                query: word,
               },
             },
           ],
@@ -435,6 +437,16 @@ export class CollaborateurService {
       .leftJoinAndSelect('cv.competences', 'competences')
       .leftJoinAndSelect('pole.equipes', 'equipes')
       .leftJoinAndSelect('equipes.collaborateurs', 'collaborateurs');
+    return query.getOne();
+  }
+
+  async findMailCol(email : string){
+    const query = this.collaborateurRepository.createQueryBuilder('collaborateur');
+    query
+      .where('collaborateur.emailPro= :email', { email })
+      .orWhere('collaborateur.email= :email', { email })
+      .leftJoinAndSelect('collaborateur.cv', 'cv')
+      .leftJoinAndSelect('cv.competences', 'competences');
     return query.getOne();
   }
 

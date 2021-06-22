@@ -13,8 +13,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import { CreatePersonneInput } from 'src/candidat/dto/create-personne.input';
-import { UserPermission } from 'src/enum/UserPermission';
+import { CreatePersonneInput } from './../../candidat/dto/create-personne.input';
 import { Index } from 'typeorm';
 import { UserRole } from '../../enum/UserRole';
 import { Equipe } from '../entities/equipe.entity';
@@ -62,11 +61,6 @@ export class CreateColInput extends CreatePersonneInput {
 
   @IsNotEmpty()
   @Field((type) => UserRole)
-  role: UserRole;
-
-  @IsNotEmpty()
-  @Field((type) => UserPermission)
-  permission: UserPermission;
 
   @Max(5, {
     message: 'Evaluation max=5',

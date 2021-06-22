@@ -7,10 +7,10 @@ var _ = require('underscore');
 module.exports = {
   titles: {
     address: ['address','adresse'],
-    ActAssociatives: ['expériences associatives','vie associative','activités','activites'],
-    experience: ['experience professionnelle et associative','experiences pro.','experiences pro','experiences','stages professionnels','stages'],
+    ActAssociatives: ['expériences associatives','vie associative'],
+    experience: ['experience professionnelle et associative','experience professionnelle','experiences pro.','experiences pro','experiences','stages professionnels','stages'],
     education: ['education','parcours académique','formations','formation'],
-    skills: ['skills', 'Skills & Expertise','compétences','competences'],
+    skills: ['skills', 'Skills & Expertise','compétences','competences','technologie'],
     languages: ['langues','l angue','languages'],
     projects: ['projets academiques','projects','projets'],
     certification: ['certification', 'certifications','certificats','certi cations'],

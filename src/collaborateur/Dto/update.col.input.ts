@@ -16,7 +16,6 @@ import {
 import { UpdateEquipeInput } from './update-equipe.input';
 import { UpdatePersonneInput } from '../../candidat/dto/update-personne.input';
 import { Index } from 'typeorm';
-import { UserPermission } from 'src/enum/UserPermission';
 
 @InputType() //representation mta3 input = dto
 export class UpdateColInput extends UpdatePersonneInput {
@@ -63,10 +62,6 @@ export class UpdateColInput extends UpdatePersonneInput {
   @IsOptional()
   @Field((type) => UserRole, { nullable: true })
   role?: UserRole;
-
-  @IsOptional()
-  @Field((type) => UserPermission, { nullable: true })
-  permission?: UserPermission;
 
   @MaxLength(5, {
     message: 'Evaluation max=5',

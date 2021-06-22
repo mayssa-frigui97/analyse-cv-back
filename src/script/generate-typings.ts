@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { GraphQLDefinitionsFactory } from '@nestjs/graphql';
 import { join } from 'path';
 

@@ -1,9 +1,12 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable no-var */
+/* eslint-disable @typescript-eslint/no-var-requires */
 const parseIt = require('./utils/parseIt');
 var logger = require('tracer').colorConsole();
 
-module.exports.parseResumeFile = function(inputFile, outputDir) {
+module.exports.parseResumeFile = function (inputFile, outputDir) {
   return new Promise((resolve, reject) => {
-    parseIt.parseResumeFile(inputFile, outputDir, function(file, error) {
+    parseIt.parseResumeFile(inputFile, outputDir, function (file, error) {
       if (error) {
         return reject(error);
       }
@@ -12,9 +15,9 @@ module.exports.parseResumeFile = function(inputFile, outputDir) {
   });
 };
 
-module.exports.parseResumeUrl = function(url) {
+module.exports.parseResumeUrl = function (url) {
   return new Promise((resolve, reject) => {
-    parseIt.parseResumeUrl(url, function(file, error) {
+    parseIt.parseResumeUrl(url, function (file, error) {
       if (error) {
         return reject(error);
       }

@@ -13,10 +13,11 @@ import { CreatePersonneInput } from './dto/create-personne.input';
 import { Personne } from './entities/personne.entity';
 import { UpdatePersonneInput } from './dto/update-personne.input';
 import { UseGuards } from '@nestjs/common';
-import { authGuard } from 'src/auth/Guards/auth.guard';
-import { RolesGuard } from 'src/auth/Guards/role.guard';
-import { UserRole } from 'src/enum/UserRole';
-import { Roles } from 'src/decorators/role.decorator';
+import { authGuard } from './../auth/Guards/auth.guard';
+import { RolesGuard } from './../auth/Guards/role.guard';
+import { UserRole } from './../enum/UserRole';
+import { Roles } from './../decorators/role.decorator';
+import { CreateCandidatureInput } from './dto/create-candidature.input';
 
 @Resolver(() => Personne)
 export class PersonneResolver {
@@ -128,7 +129,7 @@ export class PersonneResolver {
     return this.personneService.getFilterCand(selectedComp);
   }
 
-  /**********Personneure**********/
+  /**********Candidature**********/
   @Query(() => [Candidature], { name: 'findCandidatures' })
   findAllCandidatures() {
     return this.personneService.findAllcandidatures();
@@ -141,8 +142,11 @@ export class PersonneResolver {
     return this.personneService.findOnecandidature(idCandidature);
   }
 
-  // @ResolveField((returns)=>Cv)
-  // findCv(@Parent() Personneure: Personneure):Promise<Cv>{
-  //   return this.personneService.findCv(Personneure.cv.id)
-  // }
+  @Mutation(() => Candidature)
+  createCandidature(
+    @Args('createCandidatureInput')
+    createCandidatureInput: CreateCandidatureInput,
+  ) {
+    return this.personneService.createCandidature(createCandidatureInput);
+  }
 }

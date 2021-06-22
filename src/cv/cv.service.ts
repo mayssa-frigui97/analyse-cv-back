@@ -6,15 +6,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Cv } from './entities/cv.entity';
 import { CreateCvInput } from './dto/create-cv.input';
 import { UpdateCvInput } from './dto/update-cv.input';
-import { readFile, writeFile, readdir, unlink, createWriteStream } from 'fs';
-import { StatutCV } from 'src/enum/StatutCV';
-import { PersonneService } from 'src/candidat/personne.service';
-import { CreatePersonneInput } from 'src/candidat/dto/create-personne.input';
+import { readdir } from 'fs';
+import { PersonneService } from './../candidat/personne.service';
+import { CreatePersonneInput } from './../candidat/dto/create-personne.input';
 import { Competence } from './entities/competence.entity';
 import { UpdateCompetenceInput } from './dto/update-competence.input';
 import { CreateCompetenceInput } from './dto/create-competence.input';
-import { Personne } from 'src/candidat/entities/personne.entity';
-
+import { Personne } from './../candidat/entities/personne.entity';
+import { Collaborateur } from './../collaborateur/entities/collaborateur.entity';
+import { CollaborateurService } from './../collaborateur/collaborateur.service';
+import { UpdatePersonneInput } from './../candidat/dto/update-personne.input';
+import { CreateCandidatureInput } from './../candidat/dto/create-candidature.input';
+import { StatutCV } from './../enum/StatutCV';
+// import * as ResumeParser from 'resume-parser';
+// var imaps = require('imap-simple');
+// const _ = require('lodash');
 var inspect = require('util').inspect;
 var fs = require('fs');
 const { Base64Decode } = require('base64-stream');
@@ -31,15 +37,13 @@ var imap = new Imap({
   connTimeout: 20000,
 });
 
-const path = require('path');
-const os = require('os');
-
 @Injectable()
 export class CvService {
   constructor(
     @InjectRepository(Cv)
     private cvRepository: Repository<Cv>,
     private personneService: PersonneService,
+    private colService: CollaborateurService,
     @InjectRepository(Competence)
     private competenceRepository: Repository<Competence>,
   ) {}
@@ -62,9 +66,109 @@ export class CvService {
   //  return file;
   // }
 
+  async getCandidature() {
+    var datePost;
+    var emailCand;
+    this.getMsg().then(({ date, email }) => {
+      datePost = date;
+      emailCand = email;
+    });
+    console.log('__datePost:', datePost);
+    console.log('__EmailPost:', emailCand);
+    return datePost;
+  }
+
+  async getMsg() {
+    return new Promise((resolve, reject) => {
+      var email;
+      var date;
+      imap.once('ready', function () {
+        imap.openBox('INBOX', true, function (err, box) {
+          if (err) throw err;
+          imap.search(
+            ['ALL', ['SINCE', 'APRIL 10, 2021']],
+            function (err, results) {
+              if (err) throw err;
+              var f = imap.seq.fetch(box.messages.total + ':*', {
+                bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)',
+                struct: true,
+              });
+              f.on('message', function (msg, seqno) {
+                console.log('Message #%d', seqno);
+                var prefix = '(#' + seqno + ') ';
+                msg.on('body', function (stream, info) {
+                  if (info.which === 'TEXT')
+                    console.log(
+                      prefix + 'Body [%s] found, %d total bytes',
+                      inspect(info.which),
+                      info.size,
+                    );
+                  var buffer = '',
+                    count = 0;
+                  stream.on('data', function (chunk) {
+                    count += chunk.length;
+                    buffer += chunk.toString('utf8');
+                    console.log('BUFFER', buffer); //HEre i am able to view the body
+                    if (info.which === 'TEXT')
+                      console.log(
+                        prefix + 'Body [%s] (%d/%d)',
+                        inspect(info.which),
+                        count,
+                        info.size,
+                      );
+                  });
+                  stream.once('end', function () {
+                    if (info.which !== '') {
+                      console.log(
+                        prefix + 'Parsed header: %s',
+                        inspect(Imap.parseHeader(buffer)),
+                      );
+                      var user = Imap.parseHeader(buffer).from;
+                      var parts = user.toString().split('<');
+                      var part = parts[1];
+                      var parties = part.split('>');
+                      email = parties[0];
+                      console.log('----email:', email);
+                    } else console.log(prefix + 'Body [%s] Finished', inspect(info.which));
+                  });
+                });
+                msg.once('attributes', function (attrs) {
+                  console.log(
+                    prefix + 'Attributes: %s',
+                    inspect(attrs, false, 8),
+                  );
+                  date = attrs.date;
+                  console.log('***date postul:', date);
+                  // addCandidature(date,email);
+                });
+                msg.once('end', function () {
+                  console.log(prefix + 'Finished');
+                });
+              });
+              f.once('error', function (err) {
+                console.log('Fetch error: ' + err);
+                reject(new Error(err));
+              });
+              f.once('end', function () {
+                console.log('Done fetching all messages!');
+                imap.end();
+              });
+            },
+          );
+          resolve({ date, email });
+        });
+      });
+      imap.once('error', function (err) {
+        console.log(err);
+        reject(new Error(err));
+      });
+      imap.connect();
+    });
+  }
+
   async extractOneCv(file): Promise<boolean> {
     const inputDir = 'files/cvs/';
-    const outputDir = 'files/extractedCvLocal';
+    const outputDir = 'files/compiledFiles';
     ResumeParser.parseResumeFile(inputDir + file, outputDir) // input file, output dir
       .then((file) => {
         console.log('Yay! ' + file);
@@ -83,11 +187,17 @@ export class CvService {
       for (const file of files) {
         const rawdata = fs.readFileSync(directory_name + file);
         const output = JSON.parse(rawdata);
-        let cv: Cv;
-        await this.findCvByMail(output.email).then((result) => {
-          cv = result;
+        let cand: Personne;
+        let col: Collaborateur;
+        await this.personneService
+          .findPerByMail(output.email)
+          .then((result) => {
+            cand = result;
+          });
+        await this.colService.findMailCol(output.email).then((result) => {
+          col = result;
         });
-        if (!cv) {
+        if (!cand && !col) {
           // console.log("Personne",output.name,"n'existe pas",cv)
           var createcvinput = new CreateCvInput();
           createcvinput.statutCV = StatutCV.RECU;
@@ -98,142 +208,8 @@ export class CvService {
           createcvinput.certificats = output.certification;
           createcvinput.interets = output.interests;
           createcvinput.projets = output.projects;
-          var competences0 = output.skills.split('(ubuntu)').join('');
-          var competences1 = competences0.split('.\n').join(',');
-          var competences2 = competences1.split(',\n').join(','); //replaceAll("\n",",")
-          var competences3 = competences2.split('\n,').join(',');
-          var competences4 = competences3.split('\n').join(',');
-          var competences5 = competences4.split('▪ ').join('');
-          var competences6 = competences5.split('- ').join('');
-          var competences7 = competences6.split('...').join('');
-          var indice = competences7.indexOf('(');
-          // console.log('indice', indice);
-          if (indice !== -1) {
-            var indexe = competences7.indexOf(')');
-            // console.log('indexe', indexe);
-            if (indexe !== -1) {
-              var chaine = competences7.substring(indice, indexe + 1);
-              var ind = chaine.indexOf(',');
-              if (ind !== -1) {
-                // console.log('--chaine', chaine);
-                var chaine = chaine.split(',').join('/');
-                // console.log('--chaine contient () :', chaine);
-                competences7 = competences7.replace(
-                  competences7.substring(indice, indexe + 1),
-                  chaine,
-                );
-                // console.log('**competences contient () apres:', competences7);
-              }
-            }
-          }
-          var comps = competences7.split(',');
-          // console.log('comps:', comps);
-          var C = '';
-          for (var i = 0; i < comps.length; i++) {
-            // console.log('comp:', comps[i]);
-            var index = comps[i].indexOf(': ');
-            if (index !== -1) {
-              // console.log("c'est un T : C");
-              var x = comps[i].split(': ');
-              comps[i] = x[1];
-              if (i != comps.length - 1) {
-                C = C + x[1] + ',';
-              } else {
-                C = C + x[1];
-              }
-            }
-            if (comps[i][0] == ' ') {
-              // console.log("c'est un premier espace");
-              comps[i] = comps[i].replace(' ', '');
-            }
-            var indexe = comps[i].indexOf(':');
-            if (indexe == comps[i].length - 1) {
-              // console.log("c'est un T:");
-            }
-            if (index == -1 && indexe == -1) {
-              if (i != comps.length - 1) {
-                C = C + comps[i] + ',';
-              } else {
-                C = C + comps[i];
-              }
-            }
-          }
-          if (C.indexOf('.') == C.length - 1) {
-            // console.log('--point final!');
-            C = C.slice(0, -1);
-          }
-          output.skills = C;
-          var competences = output.skills.split(' et ').join(',');
-          var competence = competences.split(',');
-          var compts = [];
-          competence.forEach((comp) => {
-            compts.push({ nom: comp });
-          });
-          createcvinput.competences = compts;
-          var langues = output.languages.split('\n').join(',');
-          var langue = langues.split(' ▪ ').join('');
-          var parts = langue.split(',');
-          // console.log('parts:', parts);
-          var L = '';
-          for (var i = 0; i < parts.length; i++) {
-            // console.log('part:', parts[i]);
-            var indexep = parts[i].indexOf(' : ');
-            if (indexep !== -1) {
-              // console.log("c'est un :");
-              var x = parts[i].split(' :');
-              parts[i] = x[0];
-              if (i != parts.length - 1) {
-                L = L + x[0] + ',';
-              } else {
-                L = L + x[0];
-              }
-              // console.log('x[0]**', x[0]);
-            }
-            var index = parts[i].indexOf(': ');
-            if (index !== -1) {
-              // console.log("c'est un :");
-              var x = parts[i].split(':');
-              parts[i] = x[0];
-              if (i != parts.length - 1) {
-                L = L + x[0] + ',';
-              } else {
-                L = L + x[0];
-              }
-              // console.log('x[0]**', x[0]);
-            }
-            // var indexe = parts[i].indexOf(' ');
-            // if (indexe !== -1) {
-            //   console.log("c'est un espace");
-            //   var x = parts[i].split(' ');
-            //   parts[i] = x[0];
-            //   if (i != parts.length - 1) {
-            //     L = L + x[0] + ',';
-            //   } else {
-            //     L = L + x[0];
-            //   }
-            //   console.log('x[0]**', x[0]);
-            // }
-            var indexp = parts[i].indexOf('(');
-            if (indexp !== -1) {
-              // console.log("c'est un (");
-              var x = parts[i].split('(');
-              parts[i] = x[0];
-              if (i != parts.length - 1) {
-                L = L + x[0] + ',';
-              } else {
-                L = L + x[0];
-              }
-              // console.log('x[0]**', x[0]);
-            }
-            if (index == -1 && indexp == -1 && indexe == -1 && indexep == -1) {
-              if (i != parts.length - 1) {
-                L = L + parts[i] + ',';
-              } else {
-                L = L + parts[i];
-              }
-            }
-          }
-          output.languages = L;
+          createcvinput.competences = this.addCompetences(output);
+          output.languages = this.addLangues(output);
           createcvinput.langues = output.languages;
           this.createCV(createcvinput).then((cv) => {
             var createperinput = new CreatePersonneInput();
@@ -255,35 +231,189 @@ export class CvService {
             console.log('perinput:', createperinput);
           });
           console.log('cvinput:', createcvinput);
+        } else if (col) {
+          console.log(
+            'Personne',
+            output.name,
+            ' existe déja en tant que collaborateur!',
+          );
         } else {
-          // console.log("Personne",output.name,"déja existe!")
+          this.updateCand(output, cand);
         }
       }
     });
     return true;
   }
 
-  async createCvs(): Promise<boolean> {
-    let cvInput: CreateCvInput;
-    let perInput: CreatePersonneInput;
-    this.getCvsMail();
-    // .then(({createper,createCv})=>{
-    //   await this.createCV(createCv).then(async (cv)=>{
-    //     createper.cvId=cv.id;
-    //     await this.personneService.createPersonne(createper);
-    // console.log("**cv crée:",cv);
-    // console.log("**personne crée:",createper);
-    // cvInput=createCv;
-    // perInput =createper;
-    // });
-    setTimeout(async () => {
-      const cv = this.createCV(cvInput);
-      perInput.cvId = (await cv).id;
-      const per = this.personneService.createPersonne(perInput);
-      console.log('**cv crée:', cv);
-      console.log('**personne crée:', per);
-    }, 10000);
-    return true;
+  updateCand(output, cand) {
+    console.log('Personne', output.name, ' existe déja !');
+    console.log('updating CV...');
+    var updatecvinput = new UpdateCvInput();
+    updatecvinput.cmptLinkedin = output.profiles;
+    updatecvinput.activiteAssociatives = output.ActAssociatives;
+    updatecvinput.experiences = output.experience;
+    updatecvinput.formations = output.education;
+    updatecvinput.certificats = output.certification;
+    updatecvinput.interets = output.interests;
+    updatecvinput.projets = output.projects;
+    updatecvinput.competences = this.addCompetences(output);
+    output.languages = this.addLangues(output);
+    updatecvinput.langues = output.languages;
+    this.updateCV(cand.cv.id, updatecvinput);
+    var updateperinput = new UpdatePersonneInput();
+    updateperinput.nom = output.name;
+    updateperinput.tel = output.phone;
+    if (output.datebirdh) {
+      var parts = output.datebirdh.split('/');
+      var date = new Date(parts[2], parts[1] - 1, parts[0]);
+      updateperinput.dateNaiss = date;
+    }
+    updateperinput.etatCivil = output.etatcivil;
+    updateperinput.adresse = output.address;
+    this.personneService.updatePersonne(cand.id, updateperinput);
+    console.log('updateperinput:', updateperinput);
+  }
+
+  addCompetences(output) {
+    var competences0 = output.skills.split('(ubuntu)').join('');
+    var competences1 = competences0.split('.\n').join(',');
+    var competences2 = competences1.split(',\n').join(','); //replaceAll("\n",",")
+    var competences3 = competences2.split('\n,').join(',');
+    var competences4 = competences3.split('\n').join(',');
+    var competences5 = competences4.split('▪ ').join('');
+    var competences6 = competences5.split('- ').join('');
+    var competences7 = competences6.split('...').join('');
+    var indice = competences7.indexOf('(');
+    // console.log('indice', indice);
+    if (indice !== -1) {
+      var indexe = competences7.indexOf(')');
+      // console.log('indexe', indexe);
+      if (indexe !== -1) {
+        var chaine = competences7.substring(indice, indexe + 1);
+        var ind = chaine.indexOf(',');
+        if (ind !== -1) {
+          // console.log('--chaine', chaine);
+          var chaine = chaine.split(',').join('/');
+          // console.log('--chaine contient () :', chaine);
+          competences7 = competences7.replace(
+            competences7.substring(indice, indexe + 1),
+            chaine,
+          );
+          // console.log('**competences contient () apres:', competences7);
+        }
+      }
+    }
+    var comps = competences7.split(',');
+    // console.log('comps:', comps);
+    var C = '';
+    for (var i = 0; i < comps.length; i++) {
+      // console.log('comp:', comps[i]);
+      var index = comps[i].indexOf(': ');
+      if (index !== -1) {
+        // console.log("c'est un T : C");
+        var x = comps[i].split(': ');
+        comps[i] = x[1];
+        if (i != comps.length - 1) {
+          C = C + x[1] + ',';
+        } else {
+          C = C + x[1];
+        }
+      }
+      if (comps[i][0] == ' ') {
+        // console.log("c'est un premier espace");
+        comps[i] = comps[i].replace(' ', '');
+      }
+      var indexe = comps[i].indexOf(':');
+      if (indexe == comps[i].length - 1) {
+        // console.log("c'est un T:");
+      }
+      if (index == -1 && indexe == -1) {
+        if (i != comps.length - 1) {
+          C = C + comps[i] + ',';
+        } else {
+          C = C + comps[i];
+        }
+      }
+    }
+    if (C.indexOf('.') == C.length - 1) {
+      // console.log('--point final!');
+      C = C.slice(0, -1);
+    }
+    output.skills = C;
+    var competences = output.skills.split(' et ').join(',');
+    var competence = competences.split(',');
+    var compts = [];
+    competence.forEach((comp) => {
+      compts.push({ nom: comp });
+    });
+    return compts;
+  }
+
+  addLangues(output) {
+    var langues = output.languages.split('\n').join(',');
+    var langue = langues.split(' ▪ ').join('');
+    var parts = langue.split(',');
+    // console.log('parts:', parts);
+    var L = '';
+    for (var i = 0; i < parts.length; i++) {
+      // console.log('part:', parts[i]);
+      var indexep = parts[i].indexOf(' : ');
+      if (indexep !== -1) {
+        // console.log("c'est un :");
+        var x = parts[i].split(' :');
+        parts[i] = x[0];
+        if (i != parts.length - 1) {
+          L = L + x[0] + ',';
+        } else {
+          L = L + x[0];
+        }
+        // console.log('x[0]**', x[0]);
+      }
+      var index = parts[i].indexOf(': ');
+      if (index !== -1) {
+        // console.log("c'est un :");
+        var x = parts[i].split(':');
+        parts[i] = x[0];
+        if (i != parts.length - 1) {
+          L = L + x[0] + ',';
+        } else {
+          L = L + x[0];
+        }
+        // console.log('x[0]**', x[0]);
+      }
+      var indexe = parts[i].indexOf(' ');
+      if (indexe !== -1) {
+        console.log("c'est un espace");
+        var x = parts[i].split(' ');
+        parts[i] = x[0];
+        if (i != parts.length - 1) {
+          L = L + x[0] + ',';
+        } else {
+          L = L + x[0];
+        }
+        console.log('x[0]**', x[0]);
+      }
+      var indexp = parts[i].indexOf('(');
+      if (indexp !== -1) {
+        // console.log("c'est un (");
+        var x = parts[i].split('(');
+        parts[i] = x[0];
+        if (i != parts.length - 1) {
+          L = L + x[0] + ',';
+        } else {
+          L = L + x[0];
+        }
+        // console.log('x[0]**', x[0]);
+      }
+      if (index == -1 && indexp == -1 && indexe == -1 && indexep == -1) {
+        if (i != parts.length - 1) {
+          L = L + parts[i] + ',';
+        } else {
+          L = L + parts[i];
+        }
+      }
+    }
+    return L;
   }
 
   async getCvsMail() {
@@ -314,7 +444,6 @@ export class CvService {
       var dir = 'files/cvs/';
       var filename = dir + attachment.params.name;
       var encoding = attachment.encoding;
-
       return async function (msg, seqno) {
         var prefix = '(#' + seqno + ') ';
         msg.on('body', async function (stream, info) {
@@ -328,8 +457,7 @@ export class CvService {
           await writeStream.on('finish', function () {
             console.log(prefix + 'Done writing to file %s', filename);
           });
-
-          //stream.pipe(writeStream); this would write base64 data to the file.
+          //stream.pipe(writeStream); this would write base64 data to the file
           //so we decode during streaming using
           if (toUpper(encoding) === 'BASE64') {
             //the stream is base64 encoded, so here the stream is decode on the fly and piped to the write stream (file)
@@ -341,14 +469,13 @@ export class CvService {
         });
         await msg.once('end', async function () {
           console.log(prefix + 'Finished attachment %s', filename);
+          // console.log('attachment:', attachment);
         });
-        await extractCv('files/cvs/', attachment.params.name);
+        // await extractCv('files/cvs/', attachment.params.name);
       };
     }
     async function extractCv(inputDir: string, file: string) {
       const outputDir = 'files/compiledFiles';
-      const cv = new CreateCvInput();
-      const personne = new CreatePersonneInput();
       await ResumeParser.parseResumeFile(inputDir + file, outputDir) // input file, output dir
         .then(async (file) => {
           console.log('Yay! ' + file);
@@ -365,7 +492,7 @@ export class CvService {
       imap.openBox('INBOX', true, function (err, box) {
         if (err) throw err;
         imap.search(
-          ['ALL', ['SINCE', 'June 15, 2021']],
+          ['ALL', ['SINCE', 'June 10, 2020']],
           function (err, results) {
             if (err) throw err;
             var f = imap.fetch(results, {
@@ -393,26 +520,26 @@ export class CvService {
                 for (var i = 0, len = attachments.length; i < len; ++i) {
                   var attachment = attachments[i];
                   var parts = attachment.params.name.split('.');
-                  // console.log('parts:', parts);
-                  if (
-                    (attachment.params.name.includes('cv') ||
-                      attachment.params.name.includes('CV') ||
-                      attachment.params.name.includes('Cv') ||
-                      attachment.params.name.includes('curriculum')) &&
-                    parts[1] == 'pdf'
-                  ) {
-                    console.log(
-                      prefix + 'Fetching attachment %s',
-                      attachment.params.name,
-                    );
-                    var f = imap.fetch(attrs.uid, {
-                      //do not use imap.seq.fetch here
-                      bodies: [attachment.partID],
-                      struct: true,
-                    });
-                    //build function to process attachment message
-                    f.on('message', buildAttMessageFunction(attachment));
-                  }
+                  console.log('*****************type:', attachment.subtype);
+                  // if (
+                  //   // (attachment.params.name.includes('cv') ||
+                  //   //   attachment.params.name.includes('CV') ||
+                  //   //   attachment.params.name.includes('Cv') ||
+                  //   //   attachment.params.name.includes('curriculum')) &&
+                  //   parts[1] == 'pdf'
+                  // ) {
+                  console.log(
+                    prefix + 'Fetching attachment %s',
+                    attachment.params.name,
+                  );
+                  var f = imap.fetch(attrs.uid, {
+                    //do not use imap.seq.fetch here
+                    bodies: [attachment.partID],
+                    struct: true,
+                  });
+                  //build function to process attachment message
+                  f.on('message', buildAttMessageFunction(attachment));
+                  // }
                 }
               });
               msg.once('end', function () {
@@ -514,17 +641,6 @@ export class CvService {
     return query.getRawOne();
   }
 
-  async findCvByMail(email: string): Promise<Cv> {
-    const query = this.cvRepository.createQueryBuilder('cv');
-    query
-      .where('personne.email= :email', { email })
-      .leftJoinAndSelect('cv.personne', 'personne')
-      .leftJoinAndSelect('cv.competences', 'competences')
-      .leftJoinAndSelect('personne.candidatures', 'candidatures')
-      .leftJoinAndSelect('candidatures.entretiens', 'entretiens');
-    return query.getOne();
-  }
-
   //***********competence************ */
   async findAllCompetences(): Promise<Competence[]> {
     const query = this.competenceRepository.createQueryBuilder('competence');
@@ -562,5 +678,13 @@ export class CvService {
       throw new NotFoundException(`Competence d'id ${id} n'exsite pas!`);
     }
     return await this.competenceRepository.save(newCompetence);
+  }
+
+  async addCandidature(date, email) {
+    var createInput = new CreateCandidatureInput();
+    createInput.date = date;
+    const cand = await this.personneService.findPerByMail(email);
+    createInput.candidatId = cand.id;
+    this.personneService.createCandidature(createInput);
   }
 }

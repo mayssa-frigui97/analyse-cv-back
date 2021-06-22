@@ -4,8 +4,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Cv } from '../cv/entities/cv.entity';
 import { Personne } from './entities/personne.entity';
-import { CreatePersonneInput } from 'src/Candidat/dto/create-personne.input';
+import { CreatePersonneInput } from './../Candidat/dto/create-personne.input';
 import { UpdatePersonneInput } from './dto/update-personne.input';
+import { CreateCandidatureInput } from './dto/create-candidature.input';
 
 //require the Elasticsearch librray
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -30,11 +31,12 @@ export class PersonneService {
 
   async search(mot: string): Promise<Personne[]> {
     const candidats: Personne[] = [];
+    const word = '*' + mot + '*';
     const index = 'cvs';
     const body = {
       query: {
         query_string: {
-          query: mot,
+          query: word,
         },
       },
     };
@@ -105,6 +107,15 @@ export class PersonneService {
   }
 
   /***************Personne*********/
+
+  async findPerByMail(email: string): Promise<Personne> {
+    const query = this.personneRepository.createQueryBuilder('personne');
+    query
+      .where('personne.email= :email', { email })
+      .leftJoinAndSelect('personne.cv', 'cv')
+      .leftJoinAndSelect('cv.competences', 'competences');
+    return query.getOne();
+  }
 
   async changeRecommande(idPersonne: number, value: boolean): Promise<boolean> {
     this.personneRepository
@@ -243,5 +254,18 @@ export class PersonneService {
       .leftJoinAndSelect('personne.cv', 'cv')
       .leftJoinAndSelect('cv.competences', 'competences');
     return query.getOne();
+  }
+
+  async createCandidature(
+    createCandidatureInput: CreateCandidatureInput,
+  ): Promise<Candidature> {
+    const candId = createCandidatureInput.candidatId;
+    const query = this.personneRepository.createQueryBuilder('personne');
+    query.where('personne.id= :candId', { candId });
+    const newCand = this.candidatureRepository.create(createCandidatureInput);
+    const candidat = await query.getOne();
+    newCand.personne = candidat;
+    console.log('candidat', candidat);
+    return this.candidatureRepository.save(newCand);
   }
 }

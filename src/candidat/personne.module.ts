@@ -1,12 +1,12 @@
 import { Candidature } from './entities/candidature.entity';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Cv } from 'src/cv/entities/cv.entity';
+import { Cv } from './../cv/entities/cv.entity';
 import { Personne } from './entities/personne.entity';
 import { PersonneResolver } from './personne.resolver';
 import { PersonneService } from './personne.service';
 import { Entretien } from './../entretien/entities/entretien.entity';
-import { CollaborateurModule } from 'src/collaborateur/collaborateur.module';
+import { CollaborateurModule } from './../collaborateur/collaborateur.module';
 
 @Module({
   imports: [

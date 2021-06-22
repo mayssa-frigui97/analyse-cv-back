@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Args, Int, ResolveField, Parent } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { CvService } from './cv.service';
 import { Cv } from './entities/cv.entity';
 import { CreateCvInput } from './dto/create-cv.input';
@@ -32,11 +40,6 @@ export class CvResolver {
     return this.cvService.findOneCV(idCV);
   }
 
-  @Query(() => Cv)
-  findCvByMail(@Args('email', { type: () => String }) email: string) {
-    return this.cvService.findCvByMail(email);
-  }
-
   @Mutation(() => Cv)
   updateCv(
     @Args('idCv', { type: () => Int }) idCV: number,
@@ -47,7 +50,7 @@ export class CvResolver {
 
   @Mutation(() => Boolean)
   removeCv(@Args('idCv', { type: () => Int }) idCV: number) {
-    var supp = this.cvService.removeCV(idCV);
+    const supp = this.cvService.removeCV(idCV);
     return supp;
   }
 
@@ -56,7 +59,7 @@ export class CvResolver {
     return this.cvService.findCompetences();
   }
 
-  @ResolveField(returns => Cv)
+  @ResolveField((returns) => Cv)
   async CvPersonne(@Parent() personne: Personne) {
     return this.cvService.findOneCV(personne.cvId);
   }
@@ -64,43 +67,49 @@ export class CvResolver {
   /***********EXTRACT CV**************/
 
   @Query((returns) => Boolean)
-  getCvsMail():Promise<boolean> {
+  getCvsMail(): Promise<boolean> {
     return this.cvService.getCvsMail();
   }
-  
+
   // @Query((returns) => Boolean)
   // extractCvs():Promise<boolean> {
   //   return this.cvService.extractCv();
   // }
-  
+
   @Query((returns) => Boolean)
-  extractOneCv(@Args('file') file: string):Promise<boolean> {
+  extractOneCv(@Args('file') file: string): Promise<boolean> {
     return this.cvService.extractOneCv(file);
   }
-  
+
   @Query((returns) => Boolean)
-  addCvs():Promise<boolean> {
+  addCvs(): Promise<boolean> {
     return this.cvService.addCvs();
   }
 
+  @Query((returns) => String)
+  ReturnMsg(): Promise<string> {
+    return this.cvService.getCandidature();
+  }
+
   @Mutation(() => Boolean)
-    async uploadFile(@Args({name: 'file', type: () => GraphQLUpload})
-    {
-        createReadStream,
-        filename
-    }: Upload): Promise<boolean> {
-        return new Promise(async (resolve, reject) => 
-            createReadStream()
-                .pipe(createWriteStream(`./${filename}`))
-                .on('finish', () => resolve(true))
-                .on('error', () => reject(false))
-        );
-    }
+  async uploadFile(
+    @Args({ name: 'file', type: () => GraphQLUpload })
+    { createReadStream, filename }: Upload,
+  ): Promise<boolean> {
+    return new Promise(async (resolve, reject) =>
+      createReadStream()
+        .pipe(createWriteStream(`./${filename}`))
+        .on('finish', () => resolve(true))
+        .on('error', () => reject(false)),
+    );
+  }
 
   /******************competence********** */
 
   @Mutation(() => Competence)
-  createCompetence(@Args('createCompetenceInput') createCompetenceInput: CreateCompetenceInput) {
+  createCompetence(
+    @Args('createCompetenceInput') createCompetenceInput: CreateCompetenceInput,
+  ) {
     return this.cvService.createCompetences(createCompetenceInput);
   }
 
@@ -123,5 +132,4 @@ export class CvResolver {
   ) {
     return this.cvService.updateCompetence(idCompetence, updateCompetenceInput);
   }
-
 }

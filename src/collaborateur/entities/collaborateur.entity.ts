@@ -5,7 +5,7 @@ import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
 import { IsEmail, IsOptional, MaxLength, MinLength } from 'class-validator';
 import { Personne } from '../../candidat/entities/personne.entity';
-import { UserPermission } from 'src/enum/UserPermission';
+import { RefreshToken } from './../../auth/entities/refresh-token.entity';
 
 // @ChildEntity('collaborateur')
 @Entity('collaborateur')
@@ -62,14 +62,6 @@ export class Collaborateur extends Personne {
   @Field((type) => UserRole)
   role: UserRole;
 
-  @Column({
-    type: 'enum',
-    enum: UserPermission,
-    default: UserPermission.UTILISATEUR,
-  })
-  @Field((type) => UserPermission)
-  permission: UserPermission;
-
   @Column()
   @Field((type) => Int, { nullable: true })
   evaluation?: number;
@@ -82,4 +74,9 @@ export class Collaborateur extends Personne {
   @OneToMany(() => Notification, (notification) => notification.collaborateur)
   @Field((type) => [Notification], { nullable: true })
   notifications?: Notification[];
+
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user, {
+    cascade: true,
+  })
+  refreshTokens: RefreshToken[];
 }

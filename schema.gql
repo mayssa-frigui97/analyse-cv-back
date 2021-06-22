@@ -102,7 +102,6 @@ type Collaborateur {
   dateEmb: DateTime
   nomUtilisateur: String!
   role: UserRole!
-  permission: UserPermission!
   evaluation: Int
   equipe: Equipe
   notifications: [Notification!]
@@ -113,12 +112,6 @@ enum UserRole {
   RP
   TEAMLEADER
   COLLABORATEUR
-}
-
-enum UserPermission {
-  SUPER
-  ADMINISTRATEUR
-  UTILISATEUR
 }
 
 type Equipe {
@@ -136,9 +129,15 @@ type Pole {
   rp: Collaborateur!
 }
 
-type Connexion {
+type LoginUserPayload {
   access_token: String!
+  refresh_token: String!
   user: Collaborateur
+}
+
+type RefreshTokenPayload {
+  user: Collaborateur!
+  accessToken: String!
 }
 
 type Query {
@@ -167,11 +166,11 @@ type Query {
   findEntretien(idEnt: Int!): Entretien!
   findCvs: [Cv!]!
   findCv(idCv: Int!): Cv!
-  findCvByMail(email: String!): Cv!
   findCompetences: [Cv!]!
   getCvsMail: Boolean!
   extractOneCv(file: String!): Boolean!
   addCvs: Boolean!
+  ReturnMsg: String!
   findAllCompetences: [Competence!]!
   findCompetence(idComp: Int!): Competence!
   createIndex: Boolean!
@@ -183,7 +182,7 @@ type Query {
   findFilterCands(selectedComp: [String!]): [Personne!]!
   findCandidatures: [Candidature!]!
   findCandidature(idCandidature: Int!): Candidature!
-  login(motDePasse: String!, nomUtilisateur: String!): Connexion!
+  login(motDePasse: String!, nomUtilisateur: String!): LoginUserPayload!
 }
 
 input FilterInput {
@@ -209,6 +208,8 @@ type Mutation {
   removePersonne(idPersonne: Int!): Boolean!
   removeCandidat(idCand: Int!): Boolean!
   restorePersonne(idPersonne: Int!): Personne!
+  createCandidature(createCandidatureInput: CreateCandidatureInput!): Candidature!
+  refreshToken(input: RefreshTokenInput!): RefreshTokenPayload!
   addUserLdap(motDePasse: String!, nomUtilisateur: String!): Boolean!
 }
 
@@ -229,8 +230,6 @@ input CreateColInput {
   salaire: Int!
   dateEmb: DateTime!
   nomUtilisateur: String!
-  role: UserRole!
-  permission: UserPermission!
   evaluation: Int
   equipeId: Int
 }
@@ -254,7 +253,6 @@ input UpdateColInput {
   dateEmb: DateTime
   nomUtilisateur: String
   role: UserRole
-  permission: UserPermission
   evaluation: Int
   equipe: UpdateEquipeInput
 }
@@ -338,4 +336,13 @@ input UpdatePersonneInput {
   recommande: Boolean
   cvId: Int
   cv: UpdateCvInput
+}
+
+input CreateCandidatureInput {
+  date: DateTime!
+  candidatId: Int
+}
+
+input RefreshTokenInput {
+  refreshToken: String!
 }

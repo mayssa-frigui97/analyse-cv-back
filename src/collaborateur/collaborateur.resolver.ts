@@ -11,13 +11,12 @@ import { Collaborateur } from './entities/collaborateur.entity';
 import { UpdateColInput } from './Dto/update.col.input';
 import { CreatePoleInput } from './Dto/create.pole.input';
 import { FilterInput } from './Dto/filter.input';
-import { UserRole } from 'src/enum/UserRole';
+import { UserRole } from './../enum/UserRole';
 import { isNullableType } from 'graphql';
 import { UnauthorizedException, UseGuards } from '@nestjs/common';
-import { authGuard } from 'src/auth/Guards/auth.guard';
-import { Roles } from 'src/decorators/role.decorator';
+import { authGuard } from './../auth/Guards/auth.guard';
+import { Roles } from './../decorators/role.decorator';
 import { RolesGuard } from './../auth/Guards/role.guard';
-import { UserPermission } from 'src/enum/UserPermission';
 
 @Resolver((of) => Collaborateur)
 export class CollaborateurResolver {
