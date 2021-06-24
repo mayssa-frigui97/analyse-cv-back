@@ -73,7 +73,7 @@ private async _bindLDAP({ nomUtilisateur, motDePasse }) {
         client.bind(adminusername, adminpassword, (err) => {
             if (err) {
                 console.log(err);
-                resolve(false);
+                reject(false);
                 return;
             }
     
@@ -95,7 +95,7 @@ private async _bindLDAP({ nomUtilisateur, motDePasse }) {
                 client.bind(entry.object.dn, motDePasse ,function(err){
                     if (err) {
                       console.log({ err });
-                      resolve(false);
+                      reject(false);
                       return;
                     }
                     resolve(true);
@@ -110,7 +110,7 @@ private async _bindLDAP({ nomUtilisateur, motDePasse }) {
     
               res.on('error', (err) => {
                 console.error('error: ' + err.message);
-                resolve(false);
+                reject(false);
                 return;
               });
     
@@ -165,7 +165,7 @@ private async _bindLDAP({ nomUtilisateur, motDePasse }) {
 
   async generateAccessToken(user: Collaborateur) {
     const payload = { id: user.id };
-    return await this.jwtService.signAsync(payload);
+    return await this.jwtService.signAsync(payload,{expiresIn: 120});
   }
 
   async createRefreshToken(user: Collaborateur, ttl: number) {

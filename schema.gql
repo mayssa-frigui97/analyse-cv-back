@@ -129,6 +129,16 @@ type Pole {
   rp: Collaborateur!
 }
 
+type Result {
+  date: String!
+  email: String!
+}
+
+type Liste {
+  listeResult: [Result!]!
+  listeFiles: [String!]!
+}
+
 type LoginUserPayload {
   access_token: String!
   refresh_token: String!
@@ -167,9 +177,11 @@ type Query {
   findCvs: [Cv!]!
   findCv(idCv: Int!): Cv!
   findCompetences: [Cv!]!
-  getCvsMail: Boolean!
+  getCvs: Boolean!
+  getCvsMail: Liste!
+  extractCvs(listeFiles: [String!]!): Boolean!
   extractOneCv(file: String!): Boolean!
-  addCvs: Boolean!
+  addCvs(listeFiles: [String!]!): Boolean!
   ReturnMsg: String!
   findAllCompetences: [Competence!]!
   findCompetence(idComp: Int!): Competence!

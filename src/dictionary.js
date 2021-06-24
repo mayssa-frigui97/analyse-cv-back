@@ -8,8 +8,8 @@ module.exports = {
   titles: {
     address: ['address','adresse'],
     ActAssociatives: ['expériences associatives','vie associative'],
-    experience: ['experience professionnelle et associative','experience professionnelle','experiences pro.','experiences pro','experiences','stages professionnels','stages'],
-    education: ['education','parcours académique','formations','formation'],
+    experience: ['expériences professionnelles','experience professionnelle et associative','experience professionnelle','experiences pro.','experiences pro','experiences','stages professionnels','stages'],
+    education: ['formations académiques','education','parcours académique','formations','formation'],
     skills: ['skills', 'Skills & Expertise','compétences','competences','technologie'],
     languages: ['langues','l angue','languages'],
     projects: ['projets academiques','projects','projets'],

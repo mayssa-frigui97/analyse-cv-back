@@ -7,7 +7,7 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
-import { CvService } from './cv.service';
+import { CvService, Liste, Result } from './cv.service';
 import { Cv } from './entities/cv.entity';
 import { CreateCvInput } from './dto/create-cv.input';
 import { UpdateCvInput } from './dto/update-cv.input';
@@ -18,6 +18,7 @@ import { CreateCompetenceInput } from './dto/create-competence.input';
 import { createReadStream, createWriteStream } from 'fs';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { Upload } from './upload';
+import { Candidature } from 'src/candidat/entities/candidature.entity';
 
 @Resolver(() => Cv)
 export class CvResolver {
@@ -67,14 +68,21 @@ export class CvResolver {
   /***********EXTRACT CV**************/
 
   @Query((returns) => Boolean)
-  getCvsMail(): Promise<boolean> {
+  getCvs(): Promise<boolean> {
+    return this.cvService.getCvs();
+  }
+
+  @Query((returns) => Liste)
+  getCvsMail(): Promise<Liste> {
     return this.cvService.getCvsMail();
   }
 
-  // @Query((returns) => Boolean)
-  // extractCvs():Promise<boolean> {
-  //   return this.cvService.extractCv();
-  // }
+  @Query((returns) => Boolean)
+  extractCvs(
+    @Args('listeFiles', { type: () => [String] }) liste: string[],
+  ): Promise<boolean> {
+    return this.cvService.extractCvs(liste);
+  }
 
   @Query((returns) => Boolean)
   extractOneCv(@Args('file') file: string): Promise<boolean> {
@@ -82,13 +90,15 @@ export class CvResolver {
   }
 
   @Query((returns) => Boolean)
-  addCvs(): Promise<boolean> {
-    return this.cvService.addCvs();
+  addCvs(
+    @Args('listeFiles', { type: () => [String] }) liste: string[],
+  ): Promise<boolean> {
+    return this.cvService.addCvs(liste);
   }
 
   @Query((returns) => String)
-  ReturnMsg(): Promise<string> {
-    return this.cvService.getCandidature();
+  ReturnMsg(): Promise<Candidature> {
+    return this.cvService.AddCandidature();
   }
 
   @Mutation(() => Boolean)

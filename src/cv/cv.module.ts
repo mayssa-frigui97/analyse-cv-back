@@ -8,10 +8,17 @@ import { Competence } from './entities/competence.entity';
 import { Personne } from './../candidat/entities/personne.entity';
 import { Collaborateur } from './../collaborateur/entities/collaborateur.entity';
 import { CollaborateurModule } from './../collaborateur/collaborateur.module';
+import { Candidature } from 'src/candidat/entities/candidature.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Cv, Competence, Personne, Collaborateur]),
+    TypeOrmModule.forFeature([
+      Cv,
+      Competence,
+      Personne,
+      Collaborateur,
+      Candidature,
+    ]),
     PersonneModule,
     CollaborateurModule,
   ],
