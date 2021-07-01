@@ -10,7 +10,7 @@ import { EntretienModule } from './entretien/entretien.module';
 import { CvModule } from './cv/cv.module';
 import { AuthModule } from './auth/auth.module';
 import { PersonneModule } from './candidat/personne.module';
-
+import { NotificationGateway } from './notification.gatway';
 
 @Module({
   imports: [
@@ -21,39 +21,22 @@ import { PersonneModule } from './candidat/personne.module';
       username: 'root',
       password: '',
       database: 'analyse des cvs',
-      entities: ["dist/**/*.entity{.ts,.js}"],
+      entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
     GraphQLModule.forRoot({
-      autoSchemaFile: join(process.cwd(),'schema.gql'),
+      autoSchemaFile: join(process.cwd(), 'schema.gql'),
       uploads: false,
-      context: ({req}) => ({ headers : req.headers })
+      context: ({ req }) => ({ headers: req.headers }),
     }),
     CollaborateurModule,
     NotificationModule,
     EntretienModule,
     CvModule,
     PersonneModule,
-    AuthModule
-    ],
+    AuthModule,
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, NotificationGateway],
 })
-export class AppModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer
-  //     .apply(LoggerMiddleware)
-  //     .forRoutes('cv');
-  // }implements NestModule
-  
-
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer
-  //     .apply(AuthorizationMiddleware)
-  //     .forRoutes('cv');
-  // }
-}
-// function LoggerMiddleware(LoggerMiddleware: any) {
-//   throw new Error('Function not implemented.');
-// }
-
+export class AppModule {}

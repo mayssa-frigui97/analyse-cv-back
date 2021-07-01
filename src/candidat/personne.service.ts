@@ -7,6 +7,9 @@ import { Personne } from './entities/personne.entity';
 import { CreatePersonneInput } from './../Candidat/dto/create-personne.input';
 import { UpdatePersonneInput } from './dto/update-personne.input';
 import { CreateCandidatureInput } from './dto/create-candidature.input';
+import { Count } from './../collaborateur/collaborateur.service';
+import { CvService } from './../cv/cv.service';
+import { Competence } from 'src/cv/entities/competence.entity';
 
 //require the Elasticsearch librray
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -23,11 +26,106 @@ export class PersonneService {
     private candidatureRepository: Repository<Candidature>,
     @InjectRepository(Cv)
     private cvRepository: Repository<Cv>,
+    @InjectRepository(Competence)
+    private competenceRepository: Repository<Competence>,
     @InjectRepository(Personne)
     private personneRepository: Repository<Personne>,
   ) {}
 
   /***************Requette ElasticSearch*********/
+
+  async searchFormation(formation: string): Promise<Personne[]> {
+    const candidats: Personne[] = [];
+    const index = 'cvs';
+    let body;
+    if (formation == 'Licence') {
+      body = {
+        query: {
+          bool: {
+            must: [
+              {
+                query_string: {
+                  fields: ['cv.formations', 'cv.experiences'],
+                  query: 'licence*',
+                },
+              },
+            ],
+            must_not: [
+              {
+                query_string: {
+                  fields: ['cv.formations', 'cv.experiences'],
+                  query: '*ingénieur* master',
+                },
+              },
+            ],
+          },
+        },
+      };
+    } else if (formation == 'Master') {
+      body = {
+        query: {
+          bool: {
+            must: [
+              {
+                query_string: {
+                  fields: ['cv.formations', 'cv.experiences'],
+                  query: 'master',
+                },
+              },
+            ],
+            must_not: [
+              {
+                query_string: {
+                  fields: ['cv.formations', 'cv.experiences'],
+                  query: 'doctorat',
+                },
+              },
+            ],
+          },
+        },
+      };
+    } else if (formation == 'Doctorat') {
+      body = {
+        query: {
+          query_string: {
+            fields: ['cv.formations', 'cv.experiences'],
+            query: 'doctorat',
+          },
+        },
+      };
+    } else {
+      body = {
+        query: {
+          query_string: {
+            fields: ['cv.formations', 'cv.experiences'],
+            query: '*ingénieur*',
+          },
+        },
+      };
+    }
+    console.log(`résultat des personnes recherchées:`);
+    await client
+      .search({ index: index, body: body })
+      .then((results) => {
+        console.log(
+          `found ${results.hits.total.value} items in ${results.took}ms`,
+        );
+        if (results.hits.total > 0) console.log(`returned person name:`);
+        results.hits.hits.forEach((hit, index) => {
+          console.log(
+            `\t${hit._id} - ${hit._source.nom} (score: ${hit._score})`,
+          );
+          candidats.push(hit._source);
+        });
+      })
+      .catch(console.error);
+    if (candidats !== []) {
+      console.log('résultat trouvée!!');
+      return candidats;
+    }
+    console.log('pas de résultat trouvée!!');
+    return [];
+  }
 
   async search(mot: string): Promise<Personne[]> {
     const candidats: Personne[] = [];
@@ -85,6 +183,7 @@ export class PersonneService {
       });
       console.log('Successfully imported %s', personnes.length, ' persons');
     });
+
     const { body: count } = await client.count({ index: 'cvs' });
     console.log('count: ', count);
     return true;
@@ -196,9 +295,21 @@ export class PersonneService {
   async removePersonne(idCand: number) {
     let supp = false;
     const personne = await this.findOnePersonne(idCand);
+    const candidatures = personne.candidatures;
+    if (candidatures) {
+      await candidatures.forEach((candidature) => {
+        this.removeCandidature(candidature.id);
+      });
+    }
     const cv = await this.cvRepository.findOne({
       where: { id: personne.cv.id },
     });
+    const competences = cv.competences;
+    if (competences) {
+      await competences.forEach((comp) => {
+        this.removeCompetence(comp.id);
+      });
+    }
     const PersonneToRemove = await this.personneRepository.remove(personne);
     console.log('delete personne:', personne);
     await this.cvRepository.remove(cv);
@@ -207,9 +318,24 @@ export class PersonneService {
     return await supp;
   }
 
+  async removeCompetence(idComp: number): Promise<boolean> {
+    let supp = false;
+    const comp = await this.competenceRepository.findOneOrFail(idComp);
+    console.log('**comp:', comp);
+    const comptoremove = this.competenceRepository.remove(comp);
+    if (comptoremove) {
+      supp = true;
+    }
+    return await supp;
+  }
+
   async removeCand(idCand: number) {
     let supp = false;
     const personne = await this.findOnePersonne(idCand);
+    // const candidatures = personne.candidatures;
+    // await candidatures.forEach((candidature) => {
+    //   this.removeCandidature(candidature.id);
+    // });
     const PersonneToRemove = await this.personneRepository.remove(personne);
     console.log('delete personne:', personne);
     if (PersonneToRemove) supp = true;
@@ -267,5 +393,49 @@ export class PersonneService {
     newCand.personne = candidat;
     console.log('candidat', candidat);
     return this.candidatureRepository.save(newCand);
+  }
+
+  async removeCandidature(idCand: number) {
+    let supp = false;
+    const cand = await this.findOnecandidature(idCand);
+    const candToRemove = await this.candidatureRepository.remove(cand);
+    console.log('delete personne:', cand);
+    if (candToRemove) supp = true;
+    return await supp;
+  }
+
+  /***************Statistique*********/
+
+  async countFormation(): Promise<Count[]> {
+    const listNb = [];
+    const list: Count[] = [];
+    let sum = 0;
+    const formations = ['Ingénieur', 'Master', 'Licence', 'Doctorat'];
+    for (const formation of formations) {
+      const nb = (await this.searchFormation(formation)).length;
+      const count = new Count();
+      count.nom = formation;
+      count.pourcentage = nb;
+      list.push(count);
+      sum += nb;
+      listNb.push(nb);
+    }
+    Promise.all(listNb).then(() => {
+      list.forEach((element) => {
+        element.pourcentage = (element.pourcentage * 100) / sum;
+      });
+    });
+    return list;
+  }
+
+  async countCompetence(competence: string): Promise<Personne[]> {
+    // const competences = await this.findAllCompetences();
+    const query = this.personneRepository.createQueryBuilder('Personne');
+    query
+      .leftJoinAndSelect('Personne.cv', 'cv')
+      .leftJoinAndSelect('cv.competences', 'competences')
+      .andWhere('competences.nom= (:competence)', { competence })
+      .orderBy('personne.nom');
+    return query.getMany();
   }
 }

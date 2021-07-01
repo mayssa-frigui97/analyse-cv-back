@@ -32,6 +32,10 @@ export class CreateColInput extends CreatePersonneInput {
   telPro?: number;
 
   @IsNotEmpty()
+  @Field((type) => UserRole)
+  role: UserRole;
+
+  @IsNotEmpty()
   @IsEmail()
   @Field()
   emailPro: string;

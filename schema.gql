@@ -129,6 +129,11 @@ type Pole {
   rp: Collaborateur!
 }
 
+type Count {
+  nom: String!
+  pourcentage: Float!
+}
+
 type Result {
   date: String!
   email: String!
@@ -166,12 +171,16 @@ type Query {
   findPoleRp(rpId: Int!): Pole!
   findEquipes: [Equipe!]!
   findEquipe(idEquipe: Int!): Equipe!
-  findEquipesPole(idPoles: [Int!]!): [Equipe!]!
+  findEquipesPole(idPoles: [Int!]): [Equipe!]!
   findPostes(equipe: Int, pole: Int): [Collaborateur!]!
   findRoles: [Collaborateur!]!
-  findPermissions: [Collaborateur!]!
+  CountColsEquipe(equipe: Int!): Int!
+  CountColsPole(pole: Int!): Int!
+  CountColsEquipes: [Count!]!
+  CountColsPoles: [Count!]!
   findnotifs: [Notification!]!
   findnotif(idNotif: Int!): Notification!
+  findNotifCol(idCol: Int!): [Notification!]!
   findEntretiens: [Entretien!]!
   findEntretien(idEnt: Int!): Entretien!
   findCvs: [Cv!]!
@@ -184,7 +193,10 @@ type Query {
   addCvs(listeFiles: [String!]!): Boolean!
   ReturnMsg: String!
   findAllCompetences: [Competence!]!
+  findCompetencesCols: [Competence!]!
+  findCompetencesCandidats: [Competence!]!
   findCompetence(idComp: Int!): Competence!
+  CountCompetences: [Count!]!
   createIndex: Boolean!
   createData: Boolean!
   search(mot: String!): [Personne!]!
@@ -194,6 +206,7 @@ type Query {
   findFilterCands(selectedComp: [String!]): [Personne!]!
   findCandidatures: [Candidature!]!
   findCandidature(idCandidature: Int!): Candidature!
+  CountFormation: [Count!]!
   login(motDePasse: String!, nomUtilisateur: String!): LoginUserPayload!
 }
 
@@ -205,15 +218,19 @@ input FilterInput {
 type Mutation {
   createCol(createColInput: CreateColInput!): Collaborateur!
   updateCol(updateColInput: UpdateColInput!, idCol: Int!): Collaborateur!
+  updateRole(role: UserRole!, idCol: Int!): Collaborateur!
   removeCol(idCol: Int!): Boolean!
   createPole(createPoleInput: CreatePoleInput!): Pole!
   createNotif(createNotifInput: CreateNotificationInput!): Notification!
+  removeNotif(idNotif: Int!): Boolean!
   createCv(createCvInput: CreateCvInput!): Cv!
   updateCv(updateCvInput: UpdateCvInput!, idCv: Int!): Cv!
+  updateStatutCv(statut: StatutCV!, idCv: Int!): Cv!
   removeCv(idCv: Int!): Boolean!
   uploadFile(file: Upload!): Boolean!
   createCompetence(createCompetenceInput: CreateCompetenceInput!): Competence!
   updateCompetence(updateCompetenceInput: UpdateCompetenceInput!, idCompetence: Int!): Competence!
+  removeCompetence(idComp: Int!): Boolean!
   updateRecommande(value: Boolean!, idPersonne: Int!): Boolean!
   createPersonne(createPersonneInput: CreatePersonneInput!): Personne!
   updatePersonne(updatePersonneInput: UpdatePersonneInput!, idPersonne: Int!): Personne!
@@ -237,6 +254,7 @@ input CreateColInput {
   cvId: Int!
   cin: Int!
   telPro: Int
+  role: UserRole!
   emailPro: String!
   poste: String!
   salaire: Int!
@@ -300,9 +318,9 @@ input CreatePoleInput {
 }
 
 input CreateNotificationInput {
-  date: DateTime!
   description: String!
   lu: Boolean = false
+  collaborateurId: Int!
 }
 
 input CreateCvInput {

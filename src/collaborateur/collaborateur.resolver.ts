@@ -5,7 +5,7 @@
 import { Equipe } from './entities/equipe.entity';
 import { Pole } from './entities/pole.entity';
 import { CreateColInput } from './Dto/create.col.input';
-import { CollaborateurService } from './collaborateur.service';
+import { CollaborateurService, Count } from './collaborateur.service';
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { Collaborateur } from './entities/collaborateur.entity';
 import { UpdateColInput } from './Dto/update.col.input';
@@ -89,6 +89,14 @@ export class CollaborateurResolver {
     @Args('updateColInput') updateColInput: UpdateColInput,
   ) {
     return this.collaborateurService.updateCol(id, updateColInput);
+  }
+
+  @Mutation(() => Collaborateur)
+  updateRole(
+    @Args('idCol', { type: () => Int }) id: number,
+    @Args('role', { type: () => UserRole }) role: UserRole,
+  ) {
+    return this.collaborateurService.updateRole(id, role);
   }
 
   @Mutation(() => Boolean)
@@ -182,7 +190,7 @@ export class CollaborateurResolver {
 
   @Query((returns) => [Equipe])
   findEquipesPole(
-    @Args('idPoles', { type: () => [Int] }) idPoles: number[],
+    @Args('idPoles', { type: () => [Int] ,nullable: true}) idPoles?: number[],
   ): Promise<Equipe[]> {
     return this.collaborateurService.findEquipesPoles(idPoles);
   }
@@ -200,8 +208,29 @@ export class CollaborateurResolver {
     return this.collaborateurService.findRoles();
   }
 
-  @Query(() => [Collaborateur], { name: 'findPermissions' })
-  findPermission() {
-    return this.collaborateurService.findPermissions();
+  /***********Statistique***********/
+
+  @Query(() => Int)
+  CountColsEquipe(
+    @Args('equipe', { type: () => Int}) equipe: number
+  ) {
+    return this.collaborateurService.colEquipe(equipe);
+  }
+
+  @Query(() => Int)
+  CountColsPole(
+    @Args('pole', { type: () => Int}) pole: number
+  ) {
+    return this.collaborateurService.colPole(pole);
+  }
+
+  @Query(() => [Count])
+  CountColsEquipes() {
+    return this.collaborateurService.countColsEquipes();
+  }
+
+  @Query(() => [Count])
+  CountColsPoles() {
+    return this.collaborateurService.countColsPoles();
   }
 }

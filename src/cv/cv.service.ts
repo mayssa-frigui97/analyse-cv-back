@@ -14,7 +14,10 @@ import { UpdateCompetenceInput } from './dto/update-competence.input';
 import { CreateCompetenceInput } from './dto/create-competence.input';
 import { Personne } from './../candidat/entities/personne.entity';
 import { Collaborateur } from './../collaborateur/entities/collaborateur.entity';
-import { CollaborateurService } from './../collaborateur/collaborateur.service';
+import {
+  CollaborateurService,
+  Count,
+} from './../collaborateur/collaborateur.service';
 import { UpdatePersonneInput } from './../candidat/dto/update-personne.input';
 import { CreateCandidatureInput } from './../candidat/dto/create-candidature.input';
 import { StatutCV } from './../enum/StatutCV';
@@ -821,9 +824,30 @@ export class CvService {
     return await this.cvRepository.save(newCV);
   }
 
+  async updateStatutCv(id: number, statut: StatutCV): Promise<Cv> {
+    const updateCVInput = new UpdateCvInput();
+    updateCVInput.statutCV = statut;
+    const newCV = await this.cvRepository.preload({
+      id,
+      ...updateCVInput,
+    });
+    //et la on va sauvegarder la nv entité
+    if (!newCV) {
+      //si l id n existe pas
+      throw new NotFoundException(`CV d'id ${id} n'exsite pas!`);
+    }
+    return await this.cvRepository.save(newCV);
+  }
+
   async removeCV(idCv: number): Promise<boolean> {
     var supp = false;
     const cv = await this.findOneCV(idCv);
+    const competences = cv.competences;
+    if (competences) {
+      await competences.forEach((comp) => {
+        this.removeCompetence(comp.id);
+      });
+    }
     console.log('cv:', cv);
     const cvtoremove = this.cvRepository.remove(cv);
     if (cvtoremove) {
@@ -844,6 +868,36 @@ export class CvService {
     query.select('nom').distinct(true).orderBy('competence.nom');
     // .leftJoinAndSelect('competence.cvs', 'cvs')
     // .leftJoinAndSelect('cvs.personne', 'personne');
+    return query.getRawMany();
+  }
+
+  async findCompetencesCandidats(): Promise<Competence[]> {
+    const list = [];
+    const cands = await this.personneService.findAllPersonnes();
+    cands.forEach((cand) => {
+      cand.cv.competences.forEach((comp) => {
+        list.push(comp.nom);
+      });
+    });
+    console.log('list:', list);
+    const query = this.competenceRepository.createQueryBuilder('competence');
+    await query.where('competence.nom in (:list)', { list });
+    await query.select('nom').distinct(true).orderBy('competence.nom');
+    return query.getRawMany();
+  }
+
+  async findCompetencesCols(): Promise<Competence[]> {
+    const list = [];
+    const cols = await this.colService.findAllCols();
+    cols.forEach((col) => {
+      col.cv.competences.forEach((comp) => {
+        list.push(comp.nom);
+      });
+    });
+    console.log('list:', list);
+    const query = this.competenceRepository.createQueryBuilder('competence');
+    await query.where('competence.nom in (:list)', { list });
+    await query.select('nom').distinct(true).orderBy('competence.nom');
     return query.getRawMany();
   }
 
@@ -875,5 +929,44 @@ export class CvService {
       throw new NotFoundException(`Competence d'id ${id} n'exsite pas!`);
     }
     return await this.competenceRepository.save(newCompetence);
+  }
+
+  async removeCompetence(idComp: number): Promise<boolean> {
+    var supp = false;
+    const comp = await this.findOneCompetence(idComp);
+    console.log('**comp:', comp);
+    const comptoremove = this.competenceRepository.remove(comp);
+    console.log('**comptoremove:', comptoremove);
+    if (comptoremove) {
+      supp = true;
+    }
+    return await supp;
+  }
+
+  //***********statistiques************ */
+
+  async countCompetences(): Promise<Count[]> {
+    return new Promise(async (resolve, reject) => {
+      const list = [];
+      const listNb = [];
+      const sum = (await this.personneService.findAllPersonnes()).length;
+      console.log('sum:', sum);
+      const competences = await this.findCompetencesCandidats();
+      console.log('AllCompetences: :', competences);
+      for (const comp of competences) {
+        const count = new Count();
+        const nb = (await this.personneService.countCompetence(comp.nom))
+          .length;
+        count.pourcentage = (nb * 100) / sum;
+        count.nom = comp.nom;
+        console.log(count);
+        list.push(count);
+        listNb.push(nb);
+      }
+      Promise.all(listNb).then(() => {
+        resolve(list);
+        return;
+      });
+    });
   }
 }

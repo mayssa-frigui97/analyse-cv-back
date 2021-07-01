@@ -25,7 +25,7 @@ export class AuthService {
     private refreshTokenRepository: Repository<RefreshToken>
   ) {}
 
-  // async login({ nomUtilisateur, motDePasse }):Promise<Connexion>
+  // async login({ nomUtilisateur, motDePasse }):Promise<LoginUserPayload>
   // {
   //   const status = await this._bindLDAP({ nomUtilisateur, motDePasse })
   //   if(status){
@@ -47,18 +47,17 @@ export class AuthService {
       const refreshToken = await this.generateRefreshToken(
         user,
         60 * 60 * 24 * 30,
-      );
-      const payload = new LoginUserPayload();
-      payload.user = user;
-      payload.access_token = accessToken;
-      payload.refresh_token = refreshToken;
+        );
+        const payload = new LoginUserPayload();
+        payload.user = user;
+        payload.access_token = accessToken;
+        payload.refresh_token = refreshToken;
       return payload;
     }
     else {
       console.log("nom utilisateur ou mot de passe incorrect!!")
       return {access_token:'',refresh_token:''};
     }
-    // return status;
   }
 
 private async _bindLDAP({ nomUtilisateur, motDePasse }) {
@@ -73,7 +72,7 @@ private async _bindLDAP({ nomUtilisateur, motDePasse }) {
         client.bind(adminusername, adminpassword, (err) => {
             if (err) {
                 console.log(err);
-                reject(false);
+                resolve(false);
                 return;
             }
     
@@ -95,7 +94,7 @@ private async _bindLDAP({ nomUtilisateur, motDePasse }) {
                 client.bind(entry.object.dn, motDePasse ,function(err){
                     if (err) {
                       console.log({ err });
-                      reject(false);
+                      resolve(false);
                       return;
                     }
                     resolve(true);
@@ -110,7 +109,7 @@ private async _bindLDAP({ nomUtilisateur, motDePasse }) {
     
               res.on('error', (err) => {
                 console.error('error: ' + err.message);
-                reject(false);
+                resolve(false);
                 return;
               });
     
@@ -148,12 +147,12 @@ private async _bindLDAP({ nomUtilisateur, motDePasse }) {
     return true;
   }
 
-  // async getToken(nomUtilisateur): Promise<Connexion> {
+  // async getToken(nomUtilisateur): Promise<LoginUserPayload> {
   //   try {
   //     const person = await this.collaborateurService.findColByUsername(
   //       nomUtilisateur,
   //     );
-  //     const token = await this.jwtService.signAsync({nomUtilisateur,id:person.id},{expiresIn: 1800});
+  //     const token = await this.jwtService.signAsync({nomUtilisateur,id:person.id},{expiresIn: 1800000});
   //     return {
   //       access_token: token,
   //       user: person,
@@ -165,7 +164,7 @@ private async _bindLDAP({ nomUtilisateur, motDePasse }) {
 
   async generateAccessToken(user: Collaborateur) {
     const payload = { id: user.id };
-    return await this.jwtService.signAsync(payload,{expiresIn: 120});
+    return await this.jwtService.signAsync(payload,{expiresIn: 180000000000});
   }
 
   async createRefreshToken(user: Collaborateur, ttl: number) {

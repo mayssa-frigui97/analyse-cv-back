@@ -1,19 +1,25 @@
-import { InputType, Int, Field } from '@nestjs/graphql';
-import { IsBoolean, IsDate, IsNotEmpty, IsString } from 'class-validator';
+import { InputType, Field, Int } from '@nestjs/graphql';
+import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { CreateDateColumn } from 'typeorm';
 
 @InputType()
 export class CreateNotificationInput {
-    @IsDate()
-    @IsNotEmpty()
-    @Field()
-    date:Date;
-    
-    @IsString()
-    @IsNotEmpty()
-    @Field()
-    description:string;
+  //   @CreateDateColumn()
+  //   @IsNotEmpty()
+  //   @Field()
+  //   date: Date;
 
-    @IsBoolean()
-    @Field({defaultValue:false})
-    lu:boolean;
+  @IsString()
+  @IsNotEmpty()
+  @Field()
+  description: string;
+
+  @IsBoolean()
+  @Field({ defaultValue: false, nullable: true })
+  lu?: boolean;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @Field((type) => Int)
+  collaborateurId?: number;
 }

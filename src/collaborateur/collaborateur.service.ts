@@ -12,6 +12,7 @@ import { Cv } from './../cv/entities/cv.entity';
 import { FilterInput } from './Dto/filter.input';
 import { UserRole } from './../enum/UserRole';
 import { response } from 'express';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const elasticsearch = require('elasticsearch');
 
@@ -21,6 +22,14 @@ const elasticsearch = require('elasticsearch');
 const client = new elasticsearch.Client({
   hosts: ['http://localhost:9200'],
 });
+
+@ObjectType()
+export class Count {
+  @Field()
+  nom: string;
+  @Field(() => Float)
+  pourcentage: number;
+}
 
 @Injectable()
 export class CollaborateurService {
@@ -185,7 +194,8 @@ export class CollaborateurService {
         console.log('**person:', col.nom, 'is pushed');
       });
       console.log('Successfully imported %s', cols.length, ' persons');
-    });
+    })
+
 
     const { body: count } = await client.count({ index: 'cv' });
     console.log('count: ', count);
@@ -322,6 +332,25 @@ export class CollaborateurService {
     id: number,
     updateColInput: UpdateColInput,
   ): Promise<Collaborateur> {
+    //on recupere le personne d'id id et on replace les anciennes valeurs par celles du personne passées en parametres
+    const newCol = await this.collaborateurRepository.preload({
+      id,
+      ...updateColInput,
+    });
+    //et la on va sauvegarder la nv entité
+    if (!newCol) {
+      //si l id n existe pas
+      throw new NotFoundException(`col d'id ${id} n'exsite pas!`);
+    }
+    return await this.collaborateurRepository.save(newCol);
+  }
+
+  async updateRole(
+    id: number,
+    role : UserRole,
+  ): Promise<Collaborateur> {
+    const updateColInput = new UpdateColInput();
+    updateColInput.role=role;
     //on recupere le personne d'id id et on replace les anciennes valeurs par celles du personne passées en parametres
     const newCol = await this.collaborateurRepository.preload({
       id,
@@ -520,12 +549,13 @@ export class CollaborateurService {
     return query.getOne();
   }
 
-  async findEquipesPoles(idPoles: number[]): Promise<Equipe[]> {
+  async findEquipesPoles(idPoles?: number[]): Promise<Equipe[]> {
     //return this.equipeRepository.find({relations: ['collaborateurs']});
     const query = this.equipeRepository.createQueryBuilder('equipe');
-    query
-      .where('pole.id in (:idPoles) ', { idPoles })
-      .leftJoinAndSelect('equipe.pole', 'pole')
+    if(idPoles){
+      query.where('pole.id in (:idPoles) ', { idPoles })
+    }
+    query.leftJoinAndSelect('equipe.pole', 'pole')
       .leftJoinAndSelect('pole.rp', 'rp')
       .leftJoinAndSelect('equipe.collaborateurs', 'collaborateurs')
       .leftJoinAndSelect('equipe.teamleader', 'teamleader');
@@ -540,11 +570,73 @@ export class CollaborateurService {
     return query.getRawMany();
   }
 
-  async findPermissions(): Promise<Collaborateur[]> {
+  /***************Statistique*********/
+  async colEquipe(equipeId : number):Promise<number> {
+    let count : number;
     const query = this.collaborateurRepository.createQueryBuilder(
       'collaborateur',
     );
-    query.select('permission').distinct(true);
-    return query.getRawMany();
+    query
+      .leftJoinAndSelect('collaborateur.equipe', 'equipe')
+      .leftJoinAndSelect('equipe.pole', 'pole')
+      .where('equipe.id= :equipeId',{equipeId});
+      return count = (await query.getMany()).length;
   }
+
+  async colPole(poleId : number):Promise<number> {
+    let count : number;
+    const query = this.collaborateurRepository.createQueryBuilder(
+      'collaborateur',
+    );
+    query
+      .leftJoinAndSelect('collaborateur.equipe', 'equipe')
+      .leftJoinAndSelect('equipe.pole', 'pole')
+      .where('pole.id= :poleId',{poleId});
+      return count = ((await query.getMany()).length)+1;
+  }
+
+  async countColsEquipes():Promise<Count[]>{
+    const listEquipes : Count[]=[];
+    let sum=0;
+    const equipes = await this.findAllEquipes();
+    console.log("equipes:",equipes);
+    for (const equipe of equipes){
+      const count = new Count(); 
+      count.nom=equipe.nom;
+      console.log("equipe:",equipe.id);
+      count.pourcentage = await this.colEquipe(equipe.id);
+      sum+=count.pourcentage;
+      console.log("count:",count);
+      await listEquipes.push(count);
+      console.log("liste:",listEquipes);
+    };
+    console.log("sum:",sum);
+    listEquipes.forEach(element => {
+      element.pourcentage = element.pourcentage*100 / sum
+    });
+    return listEquipes;
+  }
+
+  async countColsPoles():Promise<Count[]>{
+    const listPoles : Count[]=[];
+    let sum=0;
+    const poles = await this.findAllPoles();
+    console.log("poles:",poles);
+    for (const pole of poles){
+      const count = new Count(); 
+      count.nom=pole.nom;
+      console.log("pole:",pole.id);
+      count.pourcentage = await this.colPole(pole.id);
+      sum+=count.pourcentage;
+      console.log("count:",count);
+      await listPoles.push(count);
+      console.log("liste:",listPoles);
+    };
+    console.log("sum:",sum);
+    listPoles.forEach(element => {
+      element.pourcentage = element.pourcentage*100 / sum
+    });
+    return listPoles;
+  }
+
 }

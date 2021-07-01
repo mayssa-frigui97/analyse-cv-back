@@ -13,7 +13,7 @@ import { RefreshToken } from './entities/refresh-token.entity';
   imports: [
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '3600s' },
+      signOptions: { expiresIn: '36000000000s' },
     }),
     CollaborateurModule,
     TypeOrmModule.forFeature([Collaborateur, RefreshToken]),

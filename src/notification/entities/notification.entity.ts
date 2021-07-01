@@ -1,27 +1,36 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Collaborateur } from 'src/collaborateur/entities/collaborateur.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('notification')
 @ObjectType()
 export class Notification {
-    @PrimaryGeneratedColumn()
-    @Field(type => Int)
-    id:number;
+  @PrimaryGeneratedColumn()
+  @Field((type) => Int)
+  id: number;
 
-    @Column()
-    @Field()
-    date:Date;//nzidha lel diag de classe
-    
-    @Column()
-    @Field()
-    description:string;
+  @CreateDateColumn()
+  @Field()
+  date: Date; //nzidha lel diag de classe
 
-    @Column({default:false})
-    @Field()
-    lu:boolean;
+  @Column()
+  @Field()
+  description: string;
 
-    @ManyToOne(()=>Collaborateur, collaborateur=>collaborateur.notifications)
-    @Field(type => Collaborateur)
-    collaborateur :Collaborateur;
+  @Column({ default: false })
+  @Field()
+  lu: boolean;
+
+  @ManyToOne(
+    () => Collaborateur,
+    (collaborateur) => collaborateur.notifications,
+  )
+  @Field((type) => Collaborateur)
+  collaborateur: Collaborateur;
 }

@@ -19,6 +19,8 @@ import { createReadStream, createWriteStream } from 'fs';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { Upload } from './upload';
 import { Candidature } from 'src/candidat/entities/candidature.entity';
+import { StatutCV } from 'src/enum/StatutCV';
+import { Count } from 'src/collaborateur/collaborateur.service';
 
 @Resolver(() => Cv)
 export class CvResolver {
@@ -47,6 +49,14 @@ export class CvResolver {
     @Args('updateCvInput') updateCvInput: UpdateCvInput,
   ) {
     return this.cvService.updateCV(idCV, updateCvInput);
+  }
+
+  @Mutation(() => Cv)
+  updateStatutCv(
+    @Args('idCv', { type: () => Int }) idCV: number,
+    @Args('statut', { type: () => StatutCV }) statut: StatutCV,
+  ) {
+    return this.cvService.updateStatutCv(idCV, statut);
   }
 
   @Mutation(() => Boolean)
@@ -128,6 +138,16 @@ export class CvResolver {
     return this.cvService.findAllCompetences();
   }
 
+  @Query((returns) => [Competence])
+  findCompetencesCols(): Promise<Competence[]> {
+    return this.cvService.findCompetencesCols();
+  }
+
+  @Query((returns) => [Competence])
+  findCompetencesCandidats(): Promise<Competence[]> {
+    return this.cvService.findCompetencesCandidats();
+  }
+
   @Query((returns) => Competence)
   findCompetence(
     @Args('idComp', { type: () => Int }) idComp: number,
@@ -141,5 +161,17 @@ export class CvResolver {
     @Args('updateCompetenceInput') updateCompetenceInput: UpdateCompetenceInput,
   ) {
     return this.cvService.updateCompetence(idCompetence, updateCompetenceInput);
+  }
+
+  @Mutation(() => Boolean)
+  removeCompetence(@Args('idComp', { type: () => Int }) idComp: number) {
+    const supp = this.cvService.removeCompetence(idComp);
+    return supp;
+  }
+
+  /***************Statistique*********/
+  @Query(() => [Count])
+  CountCompetences() {
+    return this.cvService.countCompetences();
   }
 }

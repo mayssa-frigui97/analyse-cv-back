@@ -18,6 +18,7 @@ import { RolesGuard } from './../auth/Guards/role.guard';
 import { UserRole } from './../enum/UserRole';
 import { Roles } from './../decorators/role.decorator';
 import { CreateCandidatureInput } from './dto/create-candidature.input';
+import { Count } from 'src/collaborateur/collaborateur.service';
 
 @Resolver(() => Personne)
 export class PersonneResolver {
@@ -73,8 +74,8 @@ export class PersonneResolver {
   }
 
   @Query(() => Personne, { name: 'findPersonne' })
-  @UseGuards(authGuard, RolesGuard)
-  @Roles(UserRole.RH, UserRole.RP, UserRole.TEAMLEADER)
+  // @UseGuards(authGuard, RolesGuard)
+  // @Roles(UserRole.RH, UserRole.RP, UserRole.TEAMLEADER)
   findOnePersonne(@Args('idPersonne', { type: () => Int }) id: number) {
     return this.personneService.findOnePersonne(id);
   }
@@ -96,8 +97,8 @@ export class PersonneResolver {
   }
 
   @Mutation(() => Boolean)
-  @UseGuards(authGuard, RolesGuard)
-  @Roles(UserRole.RH)
+  // @UseGuards(authGuard, RolesGuard)
+  // @Roles(UserRole.RH)
   removePersonne(@Args('idPersonne', { type: () => Int }) id: number) {
     const supp = this.personneService.removePersonne(id);
     return supp;
@@ -148,5 +149,11 @@ export class PersonneResolver {
     createCandidatureInput: CreateCandidatureInput,
   ) {
     return this.personneService.createCandidature(createCandidatureInput);
+  }
+
+  /***************Statistique*********/
+  @Query(() => [Count])
+  CountFormation() {
+    return this.personneService.countFormation();
   }
 }
