@@ -218,11 +218,15 @@ input FilterInput {
 type Mutation {
   createCol(createColInput: CreateColInput!): Collaborateur!
   updateCol(updateColInput: UpdateColInput!, idCol: Int!): Collaborateur!
+  updateColEquipe(equipeId: Int!, idCol: Int!): Collaborateur!
   updateRole(role: UserRole!, idCol: Int!): Collaborateur!
   removeCol(idCol: Int!): Boolean!
   createPole(createPoleInput: CreatePoleInput!): Pole!
+  updateRp(rpId: Int!, poleId: Int!): Pole!
+  updateTl(tlId: Int!, equipeId: Int!): Equipe!
   createNotif(createNotifInput: CreateNotificationInput!): Notification!
   removeNotif(idNotif: Int!): Boolean!
+  updateNotif(lu: Boolean!, idNotif: Int!): Notification!
   createCv(createCvInput: CreateCvInput!): Cv!
   updateCv(updateCvInput: UpdateCvInput!, idCv: Int!): Cv!
   updateStatutCv(statut: StatutCV!, idCv: Int!): Cv!
@@ -284,7 +288,7 @@ input UpdateColInput {
   nomUtilisateur: String
   role: UserRole
   evaluation: Int
-  equipe: UpdateEquipeInput
+  equipeId: Int
 }
 
 input UpdateCvInput {
@@ -302,15 +306,6 @@ input UpdateCvInput {
 
 input CreateCompetenceInput {
   nom: String!
-}
-
-input UpdateEquipeInput {
-  nom: String
-  pole: UpdatePoleInput
-}
-
-input UpdatePoleInput {
-  nom: String
 }
 
 input CreatePoleInput {

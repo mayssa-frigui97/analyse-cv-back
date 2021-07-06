@@ -92,6 +92,14 @@ export class CollaborateurResolver {
   }
 
   @Mutation(() => Collaborateur)
+  updateColEquipe(
+    @Args('idCol', { type: () => Int }) id: number,
+    @Args('equipeId', { type: () => Int }) equipeId: number,
+  ) {
+    return this.collaborateurService.updateColEquipe(id,equipeId);
+  }
+
+  @Mutation(() => Collaborateur)
   updateRole(
     @Args('idCol', { type: () => Int }) id: number,
     @Args('role', { type: () => UserRole }) role: UserRole,
@@ -170,10 +178,19 @@ export class CollaborateurResolver {
     return this.collaborateurService.createPole(createPoleInput);
   }
 
+  @Mutation((returns) => Pole)
+  updateRp(
+    @Args('poleId', { type: () => Int }) poleId: number,
+    @Args('rpId', { type: () => Int }) rpId: number,
+  ): Promise<Pole> {
+    return this.collaborateurService.updateRpPole(poleId,rpId);
+  }
+
   @Query((returns) => Pole)
   findPoleRp(@Args('rpId', { type: () => Int }) rpId: number): Promise<Pole> {
     return this.collaborateurService.findPoleRp(rpId);
   }
+
   /***********Equipe***********/
   @Query((returns) => [Equipe])
   // @Roles(UserRole.RH,UserRole.ADMIN,UserRole.RP)
@@ -206,6 +223,14 @@ export class CollaborateurResolver {
   @Query(() => [Collaborateur], { name: 'findRoles' })
   findRoles() {
     return this.collaborateurService.findRoles();
+  }
+
+  @Mutation((returns) => Equipe)
+  updateTl(
+    @Args('equipeId', { type: () => Int }) equipeId: number,
+    @Args('tlId', { type: () => Int }) tlId: number,
+  ): Promise<Equipe> {
+    return this.collaborateurService.updateTlEquipe(equipeId,tlId);
   }
 
   /***********Statistique***********/

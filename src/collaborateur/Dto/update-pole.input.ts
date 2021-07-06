@@ -1,16 +1,15 @@
-import { Field, InputType } from '@nestjs/graphql';
+/* eslint-disable prettier/prettier */
+import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsOptional, IsString } from 'class-validator';
 
-@InputType()//representation mta3 input = dto
+@InputType() //representation mta3 input = dto
 export class UpdatePoleInput {
+  @IsOptional()
+  @IsString()
+  @Field({ nullable: true })
+  nom?: string;
 
-    @IsOptional()
-    @IsString()
-    @Field({nullable:true})
-    nom?: string;
-
-    // @IsOptional()
-    // @Field(type => UpdatePersonneInput,{nullable:true})
-    // rp? :UpdatePersonneInput;
-
+  @IsOptional()
+  @Field((type) => Int,{ nullable: true })
+  rp?: number;
 }

@@ -6,7 +6,6 @@ import {
     OnGatewayInit,
     SubscribeMessage,
     WebSocketGateway,
-    WsResponse,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import {
@@ -32,13 +31,6 @@ export class NotificationGateway implements OnGatewayInit, OnGatewayConnection, 
     handleDisconnect(client: Socket) {
         this.Logger.log(`Client disconnected: ${client.id}`);
     }
-
-    // @SubscribeMessage('test event')
-    // handleMessage(client: Socket, text: string): WsResponse<string> {
-    //   this.Logger.log(`got new event`);
-    // //   client.send('test event',text);
-    //   return { event: 'test event', data: text };
-    // }
 
     @SubscribeMessage('test event')
     listenForMessages(@MessageBody() data: string) {

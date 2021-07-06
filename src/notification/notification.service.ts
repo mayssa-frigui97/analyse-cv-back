@@ -52,18 +52,21 @@ export class NotificationService {
     return query.getMany();
   }
 
-  /*async updateNotif(id: number, updateNotifInput: UpdateNotificationInput):Promise<Notification> {
+  async updateNotif(id: number, lu: boolean): Promise<Notification> {
     //on recupere le personne d'id id et on replace les anciennes valeurs par celles du personne passées en parametres
-    const newNotif= await this.notificationRepository.preload({
+    const updateNotifInput = new UpdateNotificationInput();
+    updateNotifInput.lu = lu;
+    const newNotif = await this.notificationRepository.preload({
       id,
-      ...updateNotifInput
-  })
-  //et la on va sauvegarder la nv entité
-  if(!newNotif){//si l id n existe pas
+      ...updateNotifInput,
+    });
+    //et la on va sauvegarder la nv entité
+    if (!newNotif) {
+      //si l id n existe pas
       throw new NotFoundException(`notif d'id ${id} n'exsite pas!`);
+    }
+    return await this.notificationRepository.save(newNotif);
   }
-  return await this.notificationRepository.save(newNotif);
-  }*/
 
   async removeNotif(idNotif: number): Promise<boolean> {
     let supp = false;

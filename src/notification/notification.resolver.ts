@@ -33,4 +33,12 @@ export class NotificationResolver {
     const supp = this.notificationService.removeNotif(idNotif);
     return supp;
   }
+
+  @Mutation(() => Notification)
+  updateNotif(
+    @Args('idNotif', { type: () => Int }) idNotif: number,
+    @Args('lu', { type: () => Boolean }) lu: boolean,
+  ) {
+    return this.notificationService.updateNotif(idNotif, lu);
+  }
 }

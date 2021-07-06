@@ -103,13 +103,13 @@ export class PersonneService {
         },
       };
     }
-    console.log(`résultat des personnes recherchées:`);
+    // console.log(`résultat des personnes recherchées:`);
     await client
       .search({ index: index, body: body })
       .then((results) => {
-        console.log(
-          `found ${results.hits.total.value} items in ${results.took}ms`,
-        );
+        // console.log(
+        //   `found ${results.hits.total.value} items in ${results.took}ms`,
+        // );
         if (results.hits.total > 0) console.log(`returned person name:`);
         results.hits.hits.forEach((hit, index) => {
           console.log(
@@ -120,10 +120,10 @@ export class PersonneService {
       })
       .catch(console.error);
     if (candidats !== []) {
-      console.log('résultat trouvée!!');
+      // console.log('résultat trouvée!!');
       return candidats;
     }
-    console.log('pas de résultat trouvée!!');
+    // console.log('pas de résultat trouvée!!');
     return [];
   }
 

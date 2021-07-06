@@ -13,6 +13,7 @@ import { FilterInput } from './Dto/filter.input';
 import { UserRole } from './../enum/UserRole';
 import { response } from 'express';
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { UpdatePoleInput } from './Dto/update-pole.input';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const elasticsearch = require('elasticsearch');
 
@@ -42,7 +43,7 @@ export class CollaborateurService {
     private poleRepository: Repository<Pole>,
     @InjectRepository(Cv)
     private cvRepository: Repository<Cv>,
-  ) {}
+  ) { }
 
   /***************Requette ElasticSearch*********/
 
@@ -195,8 +196,6 @@ export class CollaborateurService {
       });
       console.log('Successfully imported %s', cols.length, ' persons');
     })
-
-
     const { body: count } = await client.count({ index: 'cv' });
     console.log('count: ', count);
     return true;
@@ -311,11 +310,11 @@ export class CollaborateurService {
     const newCol = this.collaborateurRepository.create(createColInput);
     const equipe = await query.getOne()
     // .then((equipe) => {
-      newCol.equipe = equipe;
-      console.log('col', newCol);
+    newCol.equipe = equipe;
+    console.log('col', newCol);
     // });
     // setTimeout(() => {
-      // console.log('col2', newCol);
+    // console.log('col2', newCol);
     // }, 500);
     return this.collaborateurRepository.save(newCol);
   }
@@ -345,23 +344,103 @@ export class CollaborateurService {
     return await this.collaborateurRepository.save(newCol);
   }
 
-  async updateRole(
-    id: number,
-    role : UserRole,
-  ): Promise<Collaborateur> {
-    const updateColInput = new UpdateColInput();
-    updateColInput.role=role;
-    //on recupere le personne d'id id et on replace les anciennes valeurs par celles du personne passées en parametres
-    const newCol = await this.collaborateurRepository.preload({
-      id,
-      ...updateColInput,
+  async updateRole(id: number, role: UserRole): Promise<Collaborateur> {
+    return new Promise(async (resolve, reject) => {
+      const updateColInput = new UpdateColInput();
+      updateColInput.role = role;
+      const newCol = await this.collaborateurRepository.preload({
+        id,
+        ...updateColInput,
+      });
+      if (!newCol) {
+        throw new NotFoundException(`col d'id ${id} n'exsite pas!`);
+      }
+      console.log("nouveau Col:", newCol.nom, newCol.role);
+      resolve(this.collaborateurRepository.save(newCol));
+      return;
     });
-    //et la on va sauvegarder la nv entité
-    if (!newCol) {
-      //si l id n existe pas
-      throw new NotFoundException(`col d'id ${id} n'exsite pas!`);
-    }
-    return await this.collaborateurRepository.save(newCol);
+  }
+
+  async updateRoleEquipe(id: number, role: UserRole, equipe: Equipe): Promise<Collaborateur> {
+    return new Promise(async (resolve, reject) => {
+      const updateColInput = new UpdateColInput();
+      updateColInput.role = role;
+      const newCol = await this.collaborateurRepository.preload({
+        id,
+        ...updateColInput,
+      });
+      if (!newCol) {
+        throw new NotFoundException(`col d'id ${id} n'exsite pas!`);
+      }
+      newCol.equipe = equipe;
+      console.log("nv Col:", newCol.nom, newCol.role, newCol.equipe);
+      resolve(this.collaborateurRepository.save(newCol));
+      return;
+    });
+  }
+
+  async updateRpPole(poleId: number, rpId: number): Promise<Pole> {
+    const pole = await this.findOnePole(poleId);
+    return await this.findOneCol(rpId).then(async (newRp) => {
+      return await this.updateRoleEquipe(pole.rp.id, UserRole.COLLABORATEUR, newRp.equipe).then(async (rp) => {
+        console.log("**old Rp:", rp)
+        console.log("**old newRp:", newRp)
+        return await this.updateRoleEquipe(newRp.id, UserRole.RP, null).then((newDataRp) => {
+          pole.rp = newDataRp;
+          console.log("**newRp:", newDataRp);
+          return this.poleRepository.save(pole);
+        })
+      })
+    })
+  }
+
+  async updateColEquipe(colId: number, equipeId: number): Promise<Collaborateur> {
+    const equipe = await this.findOneEquipe(equipeId);
+    return await this.updateRoleEquipe(colId, UserRole.COLLABORATEUR, equipe).then(async (newCol) => {
+      return await this.collaborateurRepository.save(newCol);
+    })
+  }
+
+  // async updateTlEquipe(equipeId: number, tlId: number): Promise<Equipe> {
+  //   const equipe = await this.findOneEquipe(equipeId);
+  //   return await this.findOneCol(equipe.teamleader.id).then(async (oldTl) => {
+  //     return await this.findOneCol(tlId).then(async (newTl) => {
+  //       return await this.updateRole(oldTl.id, UserRole.COLLABORATEUR).then(async (tl) => {
+  //         console.log("ancien TL:", tl);
+  //         return await this.updateRole(newTl.id, UserRole.TEAMLEADER).then(async (newDataTl) => {
+  //           equipe.teamleader = newDataTl;
+  //           // equipe.collaborateurs.forEach(col => {
+
+  //           // });
+  //           console.log("newTL:", newDataTl);
+  //           console.log("equipe:", equipe);
+  //           return await this.equipeRepository.save(equipe);
+  //         })
+  //       })
+  //     })
+  //   })
+  // }
+
+  async updateTlEquipe(equipeId: number, tlId: number): Promise<Equipe> {
+    const equipe = await this.findOneEquipe(equipeId);
+    const oldTlId = equipe.teamleader.id;
+    return await this.findOneCol(tlId).then(async (newTl) => {
+      return await this.updateRoleEquipe(newTl.id, UserRole.TEAMLEADER, equipe).then(async (newDataTl) => {
+        console.log("newTL:", newDataTl);
+        equipe.teamleader = newDataTl;
+        console.log("old equipe:", equipe);
+        await this.equipeRepository.save(equipe);
+        return await this.findOneCol(oldTlId).then(async (oldTl) => {
+          return await this.updateRole(oldTl.id, UserRole.COLLABORATEUR).then(async (tl) => {
+            console.log("ancien TL:", tl);
+            return await this.updateRoleEquipe(newTl.id, UserRole.TEAMLEADER, equipe).then(async () => {
+              console.log("new equipe:", equipe);
+              return equipe;
+            })
+          })
+        })
+      })
+    })
   }
 
   async removeCol(idCol: number): Promise<boolean> {
@@ -469,7 +548,7 @@ export class CollaborateurService {
     return query.getOne();
   }
 
-  async findMailCol(email : string){
+  async findMailCol(email: string) {
     const query = this.collaborateurRepository.createQueryBuilder('collaborateur');
     query
       .where('collaborateur.emailPro= :email', { email })
@@ -552,7 +631,7 @@ export class CollaborateurService {
   async findEquipesPoles(idPoles?: number[]): Promise<Equipe[]> {
     //return this.equipeRepository.find({relations: ['collaborateurs']});
     const query = this.equipeRepository.createQueryBuilder('equipe');
-    if(idPoles){
+    if (idPoles) {
       query.where('pole.id in (:idPoles) ', { idPoles })
     }
     query.leftJoinAndSelect('equipe.pole', 'pole')
@@ -571,70 +650,70 @@ export class CollaborateurService {
   }
 
   /***************Statistique*********/
-  async colEquipe(equipeId : number):Promise<number> {
-    let count : number;
+  async colEquipe(equipeId: number): Promise<number> {
+    let count: number;
     const query = this.collaborateurRepository.createQueryBuilder(
       'collaborateur',
     );
     query
       .leftJoinAndSelect('collaborateur.equipe', 'equipe')
       .leftJoinAndSelect('equipe.pole', 'pole')
-      .where('equipe.id= :equipeId',{equipeId});
-      return count = (await query.getMany()).length;
+      .where('equipe.id= :equipeId', { equipeId });
+    return count = (await query.getMany()).length;
   }
 
-  async colPole(poleId : number):Promise<number> {
-    let count : number;
+  async colPole(poleId: number): Promise<number> {
+    let count: number;
     const query = this.collaborateurRepository.createQueryBuilder(
       'collaborateur',
     );
     query
       .leftJoinAndSelect('collaborateur.equipe', 'equipe')
       .leftJoinAndSelect('equipe.pole', 'pole')
-      .where('pole.id= :poleId',{poleId});
-      return count = ((await query.getMany()).length)+1;
+      .where('pole.id= :poleId', { poleId });
+    return count = ((await query.getMany()).length) + 1;
   }
 
-  async countColsEquipes():Promise<Count[]>{
-    const listEquipes : Count[]=[];
-    let sum=0;
+  async countColsEquipes(): Promise<Count[]> {
+    const listEquipes: Count[] = [];
+    let sum = 0;
     const equipes = await this.findAllEquipes();
-    console.log("equipes:",equipes);
-    for (const equipe of equipes){
-      const count = new Count(); 
-      count.nom=equipe.nom;
-      console.log("equipe:",equipe.id);
+    // console.log("equipes:", equipes);
+    for (const equipe of equipes) {
+      const count = new Count();
+      count.nom = equipe.nom;
+      // console.log("equipe:", equipe.id);
       count.pourcentage = await this.colEquipe(equipe.id);
-      sum+=count.pourcentage;
-      console.log("count:",count);
+      sum += count.pourcentage;
+      // console.log("count:", count);
       await listEquipes.push(count);
-      console.log("liste:",listEquipes);
+      console.log("liste:", listEquipes);
     };
-    console.log("sum:",sum);
+    // console.log("sum:", sum);
     listEquipes.forEach(element => {
-      element.pourcentage = element.pourcentage*100 / sum
+      element.pourcentage = element.pourcentage * 100 / sum
     });
     return listEquipes;
   }
 
-  async countColsPoles():Promise<Count[]>{
-    const listPoles : Count[]=[];
-    let sum=0;
+  async countColsPoles(): Promise<Count[]> {
+    const listPoles: Count[] = [];
+    let sum = 0;
     const poles = await this.findAllPoles();
-    console.log("poles:",poles);
-    for (const pole of poles){
-      const count = new Count(); 
-      count.nom=pole.nom;
-      console.log("pole:",pole.id);
+    // console.log("poles:", poles);
+    for (const pole of poles) {
+      const count = new Count();
+      count.nom = pole.nom;
+      // console.log("pole:", pole.id);
       count.pourcentage = await this.colPole(pole.id);
-      sum+=count.pourcentage;
-      console.log("count:",count);
+      sum += count.pourcentage;
+      // console.log("count:", count);
       await listPoles.push(count);
-      console.log("liste:",listPoles);
+      // console.log("liste:", listPoles);
     };
-    console.log("sum:",sum);
+    // console.log("sum:", sum);
     listPoles.forEach(element => {
-      element.pourcentage = element.pourcentage*100 / sum
+      element.pourcentage = element.pourcentage * 100 / sum
     });
     return listPoles;
   }

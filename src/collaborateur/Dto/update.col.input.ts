@@ -75,8 +75,8 @@ export class UpdateColInput extends UpdatePersonneInput {
   evaluation?: number;
 
   @IsOptional()
-  @Field((type) => UpdateEquipeInput, { nullable: true })
-  equipe?: UpdateEquipeInput;
+  @Field((type) => Int, { nullable: true })
+  equipeId?: number;
 
   // @IsOptional()
   // @Field(type => Equipe, equipe => equipe.collaborateurs,{nullable:true})
